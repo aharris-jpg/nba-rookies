@@ -1,0 +1,933 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NBA Rookie Value Index — Full Dataset</title>
+</head>
+
+<body style="margin:0;">
+
+<section class="an-rookie-embed" role="region" aria-labelledby="an-rookie-title"
+  style="max-width:960px;width:100%;margin:16px auto;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         color:#0F172A;border:1px solid #E2E8F0;border-radius:16px;
+         box-shadow:0 1px 3px rgba(15,23,42,.10),0 14px 40px rgba(2,132,199,.16);">
+
+  <style>
+    /* ===== Scoped styles (NBA theme, light) ========================== */
+    section.an-rookie-embed,
+    section.an-rookie-embed *{ box-sizing:border-box; font-family:inherit; color:inherit; }
+
+    .an-rookie-embed{
+      --ink:#0F172A;
+      --muted:#64748B;
+      --muted2:#94A3B8;
+      --border:#E2E8F0;
+      --blue:#2563EB;
+      --sky:#0EA5E9;
+      --orange:#F97316;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 15% -25%, rgba(37,99,235,.10), transparent 60%),
+        radial-gradient(circle at 85% 120%, rgba(14,165,233,.12), transparent 65%),
+        radial-gradient(circle at -10% 115%, rgba(249,115,22,.10), transparent 65%),
+        #F8FAFC;
+    }
+
+    .an-rookie-embed::before{
+      content:"";
+      position:absolute; inset:-1px; border-radius:18px; padding:1px;
+      background:linear-gradient(135deg, rgba(37,99,235,.55), rgba(14,165,233,.35), rgba(249,115,22,.35));
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      opacity:.55; pointer-events:none;
+    }
+
+    .an-rookie-embed .head{
+      padding:14px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(37,99,235,.10), rgba(14,165,233,.06) 55%, rgba(249,115,22,.06));
+    }
+    .an-rookie-embed .title{
+      margin:0 0 4px;
+      font-size:clamp(16px,2.2vw,20px);
+      line-height:1.2;
+      font-weight:850;
+      letter-spacing:.01em;
+      color:var(--ink);
+    }
+    .an-rookie-embed .sub{ margin:0; color:var(--muted); font-size:12px; }
+    .an-rookie-embed .meta{ margin:6px 0 0; color:var(--muted2); font-size:11px; }
+
+    /* Controls */
+    .an-rookie-embed .controls{
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px 0; flex-wrap:wrap;
+    }
+    .an-rookie-embed .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      user-select:none;
+    }
+    .an-rookie-embed .btn .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:2px solid rgba(100,116,139,.35);
+      background:#fff;
+      box-shadow:inset 0 0 0 2px #fff;
+    }
+    .an-rookie-embed .btn[aria-pressed="true"]{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 2px rgba(37,99,235,.12);
+      background:linear-gradient(180deg, rgba(37,99,235,.10), #FFFFFF);
+    }
+    .an-rookie-embed .btn[aria-pressed="true"] .dot{
+      border-color:rgba(37,99,235,.35);
+      background:linear-gradient(180deg, var(--orange), var(--blue));
+    }
+    .an-rookie-embed .btn:focus-visible{
+      outline:2px solid rgba(14,165,233,.55);
+      outline-offset:2px;
+    }
+
+    .an-rookie-embed .search{
+      margin-left:auto;
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      min-width:min(360px,100%);
+      flex:1 1 260px;
+    }
+    .an-rookie-embed .search input{
+      border:0; outline:0; width:100%;
+      font-size:12px;
+      background:transparent;
+      color:var(--ink);
+    }
+    .an-rookie-embed .search .k{
+      font-size:11px; color:var(--muted);
+      padding:2px 8px; border-radius:999px;
+      border:1px solid rgba(148,163,184,.55);
+      background:linear-gradient(180deg, #fff, #F8FAFC);
+      white-space:nowrap;
+    }
+
+    /* Table wrapper */
+    .an-rookie-embed .table{
+      padding:10px 12px 12px;
+      max-height:min(74vh,700px);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-gutter:stable;
+    }
+    .an-rookie-embed .table::-webkit-scrollbar{ width:8px; height:8px }
+    .an-rookie-embed .table::-webkit-scrollbar-track{ background:#EEF2FF; border-radius:999px }
+    .an-rookie-embed .table::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg, rgba(37,99,235,.65), rgba(14,165,233,.55));
+      border-radius:999px;
+      border:2px solid #EEF2FF;
+    }
+
+    /* Grid rows */
+    .an-rookie-embed .row{
+      display:grid;
+      grid-template-columns: 56px minmax(0, 1.55fr) minmax(0, 0.95fr);
+      gap:10px;
+      align-items:center;
+      margin:6px 0;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #FBFDFF);
+      box-shadow:0 1px 0 rgba(15,23,42,.02);
+    }
+    .an-rookie-embed .row--head{
+      position:sticky; top:0; z-index:2;
+      margin:0 0 8px;
+      border-radius:12px;
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      box-shadow:0 10px 16px rgba(15,23,42,.06);
+    }
+    .an-rookie-embed .cell-head{
+      font-size:11px; text-transform:uppercase; letter-spacing:.10em;
+      color:var(--muted); font-weight:700;
+    }
+    .an-rookie-embed .cell-rank{
+      text-align:center;
+      font-variant-numeric:tabular-nums;
+      font-weight:900;
+      color:var(--ink);
+      line-height:1.1;
+    }
+    .an-rookie-embed .cell-rank small{
+      display:block;
+      margin-top:3px;
+      font-size:10px;
+      font-weight:700;
+      color:var(--muted);
+      letter-spacing:.02em;
+    }
+
+    /* Hover effect */
+    .an-rookie-embed .row--data{
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .an-rookie-embed .row--data:hover,
+    .an-rookie-embed .row--data:focus-within{
+      transform:translateY(-1px);
+      border-color:rgba(37,99,235,.45);
+      box-shadow:0 0 0 2px rgba(37,99,235,.10), 0 14px 28px rgba(2,132,199,.14);
+      outline:0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(37,99,235,.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,.06), transparent 55%),
+        #FFFFFF;
+    }
+
+    /* Player cell with headshot + link */
+    .an-rookie-embed .player{ display:flex; align-items:center; gap:12px; min-width:0; }
+    .an-rookie-embed .avatar{
+      flex:0 0 auto;
+      width:40px; height:40px; border-radius:999px;
+      background:linear-gradient(180deg, #FFFFFF, #F1F5F9);
+      border:1px solid rgba(148,163,184,.55);
+      box-shadow:0 6px 16px rgba(15,23,42,.08);
+      overflow:hidden;
+      padding:4px;
+    }
+    .an-rookie-embed .avatar img{
+      width:100%; height:100%; border-radius:999px; display:block;
+      object-fit:cover; object-position:center 16%;
+      background:#fff;
+    }
+
+    .an-rookie-embed a.player-link{
+      text-decoration:none;
+      color:inherit;
+      display:block;
+      min-width:0;
+    }
+    .an-rookie-embed a.player-link:hover .pname{ text-decoration:underline; text-decoration-thickness:2px; }
+    .an-rookie-embed a.player-link:focus-visible{
+      outline:2px solid rgba(14,165,233,.55);
+      outline-offset:3px;
+      border-radius:10px;
+    }
+
+    .an-rookie-embed .pname{
+      min-width:0;
+      font-weight:850;
+      font-size:13px;
+      color:var(--ink);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .an-rookie-embed .pmeta{
+      display:block;
+      margin-top:2px;
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* Metric cell */
+    .an-rookie-embed .metric{ text-align:right; min-width:0; }
+    .an-rookie-embed .metric-big{
+      font-variant-numeric:tabular-nums;
+      font-weight:900;
+      font-size:14px;
+      color:var(--ink);
+      margin-bottom:4px;
+      white-space:nowrap;
+    }
+    .an-rookie-embed .pill-wrap{ display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+    .an-rookie-embed .bar{
+      position:relative;
+      width:200px; max-width:100%;
+      height:7px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(148,163,184,.25);
+      border:1px solid rgba(148,163,184,.25);
+    }
+    .an-rookie-embed .bar > span{
+      position:absolute; inset:0; transform-origin:left center;
+      background:linear-gradient(90deg, rgba(249,115,22,.85), rgba(37,99,235,.85));
+    }
+    .an-rookie-embed .label{ font-size:10px; color:var(--muted); white-space:nowrap; }
+
+    .an-rookie-embed .empty{
+      padding:18px 14px;
+      border:1px dashed rgba(148,163,184,.7);
+      background:rgba(255,255,255,.7);
+      border-radius:14px;
+      color:var(--muted);
+      text-align:center;
+      margin:10px 0 0;
+      font-size:12px;
+    }
+
+    /* Footer */
+    .an-rookie-embed .foot{
+      padding:10px 16px 12px;
+      border-top:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px 16px;
+      justify-content:space-between;
+    }
+    .an-rookie-embed .foot strong{ color:var(--ink); }
+
+    .an-rookie-embed .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:7px 12px; border-radius:999px;
+      background:#FFFFFF;
+      border:1px solid var(--border);
+      box-shadow:0 6px 18px rgba(15,23,42,.06);
+    }
+    .an-rookie-embed .brand img{ width:74px;height:auto;display:block;border-radius:6px; }
+    .an-rookie-embed .brand .bt{ display:flex; flex-direction:column; gap:2px; line-height:1.1; }
+    .an-rookie-embed .brand .bt .t{ font-weight:800; color:var(--ink); font-size:11px; }
+    .an-rookie-embed .brand .bt .s{ color:var(--muted); font-size:10px; }
+
+    .an-rookie-embed .embed-tools{
+      display:flex; flex-direction:column; gap:6px;
+      align-items:flex-end; min-width:220px; flex:1 1 240px;
+    }
+    .an-rookie-embed .embed-btn{
+      appearance:none;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.75);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      padding:7px 10px;
+      font-size:11px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .an-rookie-embed .embed-btn:hover{
+      border-color:rgba(37,99,235,.50);
+      box-shadow:0 0 0 2px rgba(37,99,235,.10);
+    }
+    .an-rookie-embed .embed-wrap{ width:100%; max-width:420px; }
+    .an-rookie-embed .embed-label{ font-size:10px; margin-bottom:2px; color:var(--muted); text-align:right; }
+    .an-rookie-embed .embed-code{
+      width:100%;
+      min-height:72px;
+      max-height:130px;
+      padding:7px 9px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#FFFFFF;
+      color:var(--ink);
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:11px;
+      resize:vertical;
+    }
+    .an-rookie-embed .embed-status{ font-size:10px; color:var(--muted); margin-top:2px; text-align:right; }
+
+    @media (max-width:700px){
+      .an-rookie-embed .bar{ width:160px; }
+      .an-rookie-embed .foot{ flex-direction:column; align-items:flex-start; }
+      .an-rookie-embed .embed-tools{ align-items:flex-start; width:100%; }
+      .an-rookie-embed .embed-wrap{ max-width:none; }
+      .an-rookie-embed .embed-label,.an-rookie-embed .embed-status{ text-align:left; }
+    }
+    @media (max-width:480px){
+      .an-rookie-embed .row{ grid-template-columns:52px minmax(0,1.25fr) minmax(0,.95fr); padding:9px 10px; }
+      .an-rookie-embed .avatar{ width:38px; height:38px; padding:4px; }
+      .an-rookie-embed .metric-big{ font-size:13px; }
+    }
+  </style>
+
+  <header class="head">
+    <h2 id="an-rookie-title" class="title">NBA Rookie Value Index — Full Dataset</h2>
+    <p class="sub">
+      Toggle the metric to rank by <strong>Final Score</strong>, <strong>Minutes per $1M</strong>, <strong>Games per $1M</strong>, or <strong>Cost per minute</strong>. Use search to filter by player/team/position.
+    </p>
+    <p class="meta">
+      Headshots link to Basketball-Reference player pages. Bars rescale to the selected metric and current filter.
+    </p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Metric toggles and search">
+    <button type="button" class="btn metric-btn-js" data-metric="finalScore" data-dir="desc" aria-pressed="true">
+      <span class="dot" aria-hidden="true"></span>
+      Final Score (high → low)
+    </button>
+    <button type="button" class="btn metric-btn-js" data-metric="minutesPerMillion" data-dir="desc" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Minutes / $1M (high → low)
+    </button>
+    <button type="button" class="btn metric-btn-js" data-metric="gamesPerMillion" data-dir="desc" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Games / $1M (high → low)
+    </button>
+    <button type="button" class="btn metric-btn-js" data-metric="costPerMinute" data-dir="asc" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Cost / minute (low → high)
+    </button>
+
+    <div class="search" role="search" aria-label="Search players">
+      <span aria-hidden="true">🔎</span>
+      <input class="search-input-js" type="search" placeholder="Search player, team, position…" />
+      <span class="k" aria-hidden="true">Full list</span>
+    </div>
+  </div>
+
+  <div class="table" role="table" aria-label="NBA Rookie Value Index (Full Dataset)">
+    <div class="row row--head" role="row">
+      <div class="cell-head" role="columnheader">Rank</div>
+      <div class="cell-head" role="columnheader">Player</div>
+      <div class="cell-head metric-head-js" role="columnheader" style="text-align:right;">Final Score</div>
+    </div>
+
+    <div class="rows-js"></div>
+
+    <div class="empty empty-js" hidden>No matches. Try a different search.</div>
+  </div>
+
+  <footer class="foot">
+    <div class="summary-js">
+      <strong>Sorting:</strong> Final Score (high → low) • <strong>Rows:</strong> —
+    </div>
+
+    <div class="brand" aria-label="NBA Rookie Value Index">
+      <img src="https://i.postimg.cc/v8v27ZVc/download.png" alt="Logo">
+      <div class="bt">
+        <span class="t">Rookie Value Index</span>
+        <span class="s">Embed-ready full dataset</span>
+      </div>
+    </div>
+
+    <div class="embed-tools">
+      <button type="button" class="embed-btn embed-btn-js">
+        <span aria-hidden="true">⧉</span>
+        <span>Copy embed code</span>
+      </button>
+      <div class="embed-wrap embed-wrap-js" hidden>
+        <label class="embed-label" for="rookie-embed-code">Copy and paste this snippet to embed the chart:</label>
+        <textarea id="rookie-embed-code" class="embed-code embed-code-js" readonly>
+<!-- Rookie Value Index (Full Dataset) embed -->
+<iframe src="YOUR_EMBED_URL_HERE"
+title="NBA Rookie Value Index — Full Dataset" loading="lazy"
+style="border:0;width:100%;max-width:960px;height:740px;border-radius:16px;overflow:hidden;"></iframe>
+        </textarea>
+        <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var root = document.querySelector('.an-rookie-embed');
+      if(!root) return;
+
+      // =======================
+      // 1) Raw TSV dataset
+      // =======================
+      // NOTE: This parser expects TAB-separated columns (like your pasted table).
+      // If you ever update the dataset, replace the contents of RAW_TSV with the new paste.
+      var RAW_TSV = `Rank\tPlayer url\tPlayer\tDebut\tDate\tPosition\tTeam\tAge\tYrs\tGames\tMinutes Played\tDraft_Round\tDraft_Pick\tSalary 2025\tSalary_Normalized inverted\tCap hit/Cash?\tMinutesPerMillion\tMinutesPerMillion Normalized\tGamesPerMillion\tGamesPerMillion Normalized\tFinal Score\tHeight\tWeight (lb)\tHeight (cm)\tShoots\tCollege\tHigh_School\tDraft_Team\tDraft_Year\tTikTok_Handle\tIG_Handle
+1\thttps://www.basketball-reference.com/players/r/reevean01.html\tAntonio Reeves\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, NOP vs. CHI\tShooting Guard\tCharlotte Hornets\t24\t1\t44\t660\t2\t47\t85,300\t100\tCash\t7,737\t100\t516\t100\t225\t6-5\t205\t196\tRight\tIllinois State\tShadow Mountain in Phoenix, Arizona , Simeon in Chicago, Illinois\tOrlando Magic\t2024\t\thttps://instagram.com/tonioreeves
+2\thttps://www.basketball-reference.com/players/c/carlsbr01.html\tBranden Carlson\thttps://www.basketball-reference.com/boxscores/202411250SAC.html\tNov 25, '24, OKC @ SAC\tCenter\tOklahoma City Thunder\t25\t1\t32\t246\t\t\t85,300\t100\tCash\t2,884\t37\t375\t37\t164\t7-0\t220\t213\tRight\tUtah\tBingham in South Jordan, Utah\t\t\t\thttps://instagram.com/branden_carlson35
+3\thttps://www.basketball-reference.com/players/a/alexatr01.html\tTrey Alexander\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, DEN vs. OKC\tShooting Guard\tNew Orleans Pelicans\t21\t1\t24\t117\t\t\t85,300\t100\tCash\t1,372\t17\t281\t18\t130\t6-5\t185\t196\tRight\tCreighton\tHeritage Hall School in Oklahoma City, Oklahoma\t\t\t\thttps://instagram.com/TheTreyAlexander
+4\thttps://www.basketball-reference.com/players/f/freemen01.html\tEnrique Freeman\thttps://www.basketball-reference.com/boxscores/202410230DET.html\tOct 23, '24, IND @ DET\tPower Forward\tMinnesota Timberwolves\t24\t1\t22\t181\t2\t50\t85,300\t100\tCash\t2,122\t27\t258\t27\t126\t6-9\t220\t206\tRight\tUniversity of Akron\t\tIndiana Pacers\t2024\t\thttps://instagram.com/enriquefreeman_
+5\thttps://www.basketball-reference.com/players/j/jonessp01.html\tSpencer Jones\thttps://www.basketball-reference.com/boxscores/202411020DEN.html\tNov 2, '24, DEN vs. UTA\tSmall Forward\tDenver Nuggets\t23\t1\t20\t125\t\t\t85,300\t100\tCash\t1,465\t19\t234\t19\t116\t6-7\t225\t201\tRight\tStanford\tBishop Miege in Roeland Park, Kansas\t\t\t\thttps://instagram.com/skjones24
+6\thttps://www.basketball-reference.com/players/c/crawfis01.html\tIsaiah Crawford\thttps://www.basketball-reference.com/boxscores/202412080SAC.html\tDec 8, '24, SAC vs. UTA\tSmall Forward\tHouston Rockets\t23\t1\t15\t46\t\t\t85,300\t100\tCash\t539\t7\t176\t7\t95\t6-6\t220\t198\tRight\tLouisiana Tech\tNorth Crowley in Fort Worth, Texas\t\t\t\thttps://instagram.com/zaay.crawf
+7\thttps://www.basketball-reference.com/players/t/travelu01.html\tLuke Travers\thttps://www.basketball-reference.com/boxscores/202411010CLE.html\tNov 1, '24, CLE vs. ORL\tShooting Guard\tCleveland Cavaliers\t23\t1\t12\t88\t2\t56\t85,300\t100\tCash\t1,032\t13\t141\t13\t86\t6-6\t207\t198\tRight\t\tWilletton Senior High School in Willetton, Australia\tCleveland Cavaliers\t2022\thttps://www.tiktok.com/@luketravers6\thttps://instagram.com/luketravers_
+8\thttps://www.basketball-reference.com/players/t/timmedr01.html\tDrew Timme\thttps://www.basketball-reference.com/boxscores/202503280BRK.html\tMar 28, '25, BRK vs. LAC\tPower Forward\tLos Angeles Lakers\t24\t1\t9\t254\t\t\t85,300\t100\tCash\t2,978\t38\t106\t38\t83\t6-9\t235\t206\tRight\tGonzaga\tJ.J. Pearce HS in Richardson, Texas\t\t\thttps://www.tiktok.com/@drewtimme2\thttps://instagram.com/drew_timme2
+9\thttps://www.basketball-reference.com/players/e/etienty01.html\tTyson Etienne\thttps://www.basketball-reference.com/boxscores/202503280BRK.html\tMar 28, '25, BRK vs. LAC\tPoint Guard\tBrooklyn Nets\t25\t1\t7\t151\t\t\t85,300\t100\tCash\t1,770\t23\t82\t23\t71\t6-0\t200\t183\tRight\tWichita State\tDwight-Englewood School in Englewood, New Jersey , Long Island Lutheran in Brookville, New York , Putnam Science Academy in Putnam, Connecticut\t\t\t\thttps://instagram.com/thetysonetienne
+10\thttps://www.basketball-reference.com/players/p/plowdda01.html\tDaeqwon Plowden\thttps://www.basketball-reference.com/boxscores/202501150CHI.html\tJan 15, '25, ATL @ CHI\tShooting Guard\tSacramento Kings\t26\t1\t6\t72\t\t\t75,000\t100\tCash\t960\t12\t80\t12\t68\t6-4\t216\t193\tRight\tBowling Green\tMastery Charter North in Philadelphia, Pennsylvania\t\t\t\thttps://instagram.com/_dae29
+11\thttps://www.basketball-reference.com/players/j/jenkida01.html\tDaniss Jenkins\thttps://www.basketball-reference.com/boxscores/202410250CLE.html\tOct 25, '24, DET @ CLE\tPoint Guard\tDetroit Pistons\t23\t1\t7\t23\t\t\t85,300\t100\tCash\t270\t3\t82\t3\t66\t6-4\t165\t193\tRight\tUniversity of the Pacific\tHillcrest in Dallas, Texas\t\t\t\thttps://instagram.com/djenkinss5
+12\thttps://www.basketball-reference.com/players/y/youngja05.html\tJahmir Young\thttps://www.basketball-reference.com/boxscores/202503040CHI.html\tMar 4, '25, CHI vs. CLE\tPoint Guard\tMiami Heat\t24\t1\t6\t30\t\t\t85,300\t100\tCash\t352\t4\t70\t5\t62\t\t\t\tLeft\tUNC Charlotte\tSt. Mary's Ryken in Leonardtown, Maryland , DeMatha Catholic in Hyattsville, Maryland\t\t\t\thttps://instagram.com/jahm1ryoung
+13\thttps://www.basketball-reference.com/players/f/flowetr01.html\tTrentyn Flowers\thttps://www.basketball-reference.com/boxscores/202412040LAC.html\tDec 4, '24, LAC vs. MIN\tSmall Forward\tChicago Bulls\t19\t1\t6\t27\t\t\t85,300\t100\tCash\t317\t4\t70\t4\t62\t6-9\t185\t206\tRight\t\tCombine Academy in Lincolnton, North Carolina\t\t\thttps://www.tiktok.com/@trentynflowers1\thttps://instagram.com/trent_yn
+14\thttps://www.basketball-reference.com/players/m/milleem01.html\tEmanuel Miller\thttps://www.basketball-reference.com/boxscores/202503040CHI.html\tMar 4, '25, CHI vs. CLE\tPower Forward\tChicago Bulls\t24\t1\t6\t25\t\t\t85,300\t100\tCash\t293\t4\t70\t4\t62\t6-5\t215\t196\tRight\tTexas A&M\tBill Crothers Secondary School in Unionville, Canada, La Lumiere School in La Porte, Indiana , Prolific Prep in Napa, California\t\t\t\thttps://instagram.com/eman.miller
+15\thttps://www.basketball-reference.com/players/i/ingraha01.html\tHarrison Ingram\thttps://www.basketball-reference.com/boxscores/202411060HOU.html\tNov 6, '24, SAS @ HOU\tSmall Forward\tSan Antonio Spurs\t22\t1\t5\t35\t2\t48\t85,300\t100\tCash\t410\t5\t59\t5\t59\t6-5\t230\t196\tRight\tStanford\tSt. Mark's in Dallas, Texas\tSan Antonio Spurs\t2024\t\thttps://instagram.com/harrison.ingram
+16\thttps://www.basketball-reference.com/players/m/mcculke01.html\tKevin McCullar Jr.\thttps://www.basketball-reference.com/boxscores/202503250NYK.html\tMar 25, '25, NYK vs. DAL\tSmall Forward\tNew York Knicks\t23\t1\t4\t29\t2\t56\t85,300\t100\tCash\t340\t4\t47\t4\t55\t6-6\t210\t198\tRight\tTexas Tech\tWagner in San Antonio, Texas\tPhoenix Suns\t2024\t\thttps://instagram.com/kevinmccullarjr
+17\thttps://www.basketball-reference.com/players/s/steveis01.html\tIsaiah Stevens\thttps://www.basketball-reference.com/boxscores/202503290PHI.html\tMar 29, '25, MIA @ PHI\tPoint Guard\tSacramento Kings\t24\t1\t3\t6\t\t\t85,300\t100\tCash\t70\t1\t35\t1\t51\t5-11\t185\t180\tRight\tColorado State\tAllen in Allen, Texas\t\t\t\thttps://instagram.com/isaiahstevens4
+18\thttps://www.basketball-reference.com/players/w/wellsja01.html\tJaylen Wells\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tShooting Guard and Small Forward\tMemphis Grizzlies\t21\t1\t79\t2043\t2\t39\t1,955,377\t86\tCap Hit\t1,045\t13\t40\t14\t50\t6-7\t206\t201\tRight\tSonoma State University\tFolsom in Folsom, California\tMemphis Grizzlies\t2024\thttps://www.tiktok.com/@jay.snooze\thttps://instagram.com/jaylenwellss
+19\thttps://www.basketball-reference.com/players/s/sheadja01.html\tJamal Shead\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tPoint Guard\tToronto Raptors\t22\t1\t75\t1467\t2\t45\t1,955,377\t86\tCap Hit\t750\t9\t38\t10\t49\t6-1\t200\t185\tRight\tHouston\tManor in Austin, Texas\tSacramento Kings\t2024\t\t
+20\thttps://www.basketball-reference.com/players/m/mogbojo01.html\tJonathan Mogbo\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tPower Forward\tToronto Raptors\t23\t1\t63\t1286\t2\t31\t1,955,377\t86\tCap Hit\t658\t8\t32\t8\t46\t6-9\t225\t206\tRight\tMissouri State\tForest Hill in West Palm Beach, Florida\tToronto Raptors\t2024\t\thttps://instagram.com/jnathan.1
+21\thttps://www.basketball-reference.com/players/i/ighodos01.html\tOso Ighodaro\thttps://www.basketball-reference.com/boxscores/202410230LAC.html\tOct 23, '24, PHO @ LAC\tPower Forward\tPhoenix Suns\t22\t1\t61\t1045\t2\t40\t1,955,377\t86\tCap Hit\t534\t7\t31\t7\t46\t6-11\t235\t211\tRight\tMarquette\tDesert Vista in Phoenix, Arizona\tPortland Trail Blazers\t2024\t\thttps://instagram.com/oso_i
+22\thttps://www.basketball-reference.com/players/b/battlja01.html\tJamison Battle\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tSmall Forward\tToronto Raptors\t23\t1\t59\t1042\t\t\t1,955,377\t86\tCap Hit\t533\t7\t30\t7\t45\t6-7\t220\t201\tLeft\tGeorge Washington\tDeLaSalle in Minneapolis, Minnesota\t\t\t\thttps://instagram.com/battletime10
+23\thttps://www.basketball-reference.com/players/b/bonaad01.html\tAdem Bona\thttps://www.basketball-reference.com/boxscores/202410230PHI.html\tOct 23, '24, PHI vs. MIL\tCenter and Power Forward\tPhiladelphia 76ers\t21\t1\t58\t905\t2\t41\t1,955,377\t86\tCap Hit\t463\t6\t30\t6\t45\t6-10\t235\t208\tRight\tUCLA\tProlific Prep in Napa, California\tPhiladelphia 76ers\t2024\thttps://www.tiktok.com/@adembona\thttps://instagram.com/adem_bona
+24\thttps://www.basketball-reference.com/players/l/larsspe01.html\tPelle Larsson\thttps://www.basketball-reference.com/boxscores/202410230MIA.html\tOct 23, '24, MIA vs. ORL\tShooting Guard\tMiami Heat\t23\t1\t55\t782\t2\t44\t1,955,377\t86\tCap Hit\t400\t5\t28\t5\t44\t6-5\t215\t196\tRight\tUtah\t\tHouston Rockets\t2024\t\thttps://instagram.com/pellelarsson_
+25\thttps://www.basketball-reference.com/players/c/colliis01.html\tIsaiah Collier\thttps://www.basketball-reference.com/boxscores/202411070MIL.html\tNov 7, '24, UTA @ MIL\tPoint Guard\tUtah Jazz\t20\t1\t71\t1839\t1\t29\t2,638,200\t80\tCap Hit\t697\t9\t27\t9\t43\t6-4\t210\t193\tRight\tUSC\tWheeler in Marietta, Georgia\tUtah Jazz\t2024\t\thttps://instagram.com/isaiahcollier
+26\thttps://www.basketball-reference.com/players/f/furphjo01.html\tJohnny Furphy\thttps://www.basketball-reference.com/boxscores/202410250NYK.html\tOct 25, '24, IND @ NYK\tShooting Guard\tIndiana Pacers\t20\t1\t50\t379\t2\t35\t1,955,377\t86\tCap Hit\t194\t2\t26\t3\t43\t\t\t\tRight\tKansas\tAustralian Institute of Sport in Canberra, Australia\tSan Antonio Spurs\t2024\t\thttps://instagram.com/johnnyfurphy
+27\thttps://www.basketball-reference.com/players/e/edwarju01.html\tJustin Edwards\thttps://www.basketball-reference.com/boxscores/202411240PHI.html\tNov 24, '24, PHI vs. LAC\tSmall Forward\tPhiladelphia 76ers\t21\t1\t44\t1155\t\t\t2,048,494\t85\tCap Hit\t564\t7\t21\t7\t43\t6-7\t203\t201\tLeft\tKentucky\tImhotep Institute Charter in Philadelphia, Pennsylvania\t\t\t\thttps://instagram.com/jedwards3_
+28\thttps://www.basketball-reference.com/players/d/dunnry01.html\tRyan Dunn\thttps://www.basketball-reference.com/boxscores/202410230LAC.html\tOct 23, '24, PHO @ LAC\tSmall Forward\tPhoenix Suns\t22\t1\t74\t1410\t1\t28\t2,657,760\t80\tCap Hit\t531\t7\t28\t7\t43\t6-7\t216\t201\tRight\tVirginia\tThe Perkiomen School in Pennsburg, Pennsylvania\tDenver Nuggets\t2024\t\thttps://instagram.com/almighty_ry3
+29\thttps://www.basketball-reference.com/players/m/matkoka01.html\tKarlo Matković\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, NOP vs. CHI\tPower Forward\tNew Orleans Pelicans\t23\t1\t42\t791\t2\t52\t1,955,377\t86\tCap Hit\t405\t5\t21\t5\t42\t6-10\t231\t208\tRight\t\t\tNew Orleans Pelicans\t2022\t\thttps://instagram.com/karlo.matkovic
+30\thttps://www.basketball-reference.com/players/p/postqu01.html\tQuinten Post\thttps://www.basketball-reference.com/boxscores/202412270LAC.html\tDec 27, '24, GSW @ LAC\tPower Forward\tGolden State Warriors\t24\t1\t42\t686\t2\t52\t1,955,377\t86\tCap Hit\t351\t4\t21\t5\t42\t7-0\t238\t213\tRight\tMississippi State\t\tGolden State Warriors\t2024\t\thttps://instagram.com/quintenpost_
+31\thttps://www.basketball-reference.com/players/j/jonesis01.html\tIsaac Jones\thttps://www.basketball-reference.com/boxscores/202410280SAC.html\tOct 28, '24, SAC vs. POR\tPower Forward\tDetroit Pistons\t24\t1\t40\t304\t\t\t1,955,377\t86\tCap Hit\t155\t2\t20\t2\t41\t6-8\t245\t203\tRight\tWenatchee Valley College\tOrting in Orting, Washington\t\t\t\thttps://instagram.com/i.jonez
+32\thttps://www.basketball-reference.com/players/g/georgky01.html\tKyshawn George\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tShooting Guard and Small Forward\tWashington Wizards\t21\t1\t68\t1802\t1\t24\t2,966,760\t78\tCap Hit\t607\t8\t23\t8\t40\t6-8\t200\t203\tRight\tMiami (FL)\t\tNew York Knicks\t2024\t\thttps://instagram.com/kyshawn_george
+33\thttps://www.basketball-reference.com/players/f/filipky01.html\tKyle Filipowski\thttps://www.basketball-reference.com/boxscores/202410250UTA.html\tOct 25, '24, UTA vs. GSW\tCenter\tUtah Jazz\t21\t1\t72\t1522\t2\t32\t3,000,000\t78\tCap Hit\t507\t6\t24\t7\t40\t6-11\t250\t211\tRight\tDuke\tMinisink Valley in Slate Hill, New York , Fordham Preparatory School in Bronx, New York , Wilbraham & Monson Academy in Wilbraham, Massachusetts\tUtah Jazz\t2024\thttps://www.tiktok.com/@kyle.flip\thttps://instagram.com/kyleflip
+34\thttps://www.basketball-reference.com/players/c/clarkja02.html\tJaylen Clark\thttps://www.basketball-reference.com/boxscores/202501090ORL.html\tJan 9, '25, MIN @ ORL\tShooting Guard\tMinnesota Timberwolves\t23\t1\t40\t522\t2\t53\t2,191,897\t84\tCap Hit\t238\t3\t18\t3\t40\t6-5\t205\t196\tRight\tUCLA\tCentennial in Corona, California , Etiwanda in Rancho Cucamonga, California\tMinnesota Timberwolves\t2023\t\thttps://instagram.com/jaylen
+35\thttps://www.basketball-reference.com/players/k/kolekty01.html\tTyler Kolek\thttps://www.basketball-reference.com/boxscores/202410220BOS.html\tOct 22, '24, NYK @ BOS\tPoint Guard\tNew York Knicks\t23\t1\t41\t296\t2\t34\t2,191,897\t84\tCap Hit\t135\t1\t19\t2\t40\t6-2\t195\t188\tLeft\tGeorge Mason\tSt. George's School in Middletown, Rhode Island\tPortland Trail Blazers\t2024\thttps://www.tiktok.com/@tylerkolek\thttps://instagram.com/tyler_kolek
+36\thttps://www.basketball-reference.com/players/m/missiyv01.html\tYves Missi\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, NOP vs. CHI\tCenter\tNew Orleans Pelicans\t20\t1\t73\t1956\t1\t21\t3,353,040\t75\tCap Hit\t583\t7\t22\t8\t39\t6-11\t235\t211\tRight\tBaylor\tWest Nottingham Academy in Colora, Maryland , Prolific Prep in Napa, California\tNew Orleans Pelicans\t2024\thttps://www.tiktok.com/@yves.missi\thttps://instagram.com/yves.missi
+37\thttps://www.basketball-reference.com/players/j/jamesbr02.html\tBronny James\thttps://www.basketball-reference.com/boxscores/202410220LAL.html\tOct 22, '24, LAL vs. MIN\tShooting Guard\tLos Angeles Lakers\t20\t1\t27\t181\t2\t55\t1,955,377\t86\tCap Hit\t93\t1\t14\t1\t39\t6-2\t210\t188\tRight\tUSC\tSierra Canyon in Chatsworth, California\tLos Angeles Lakers\t2024\t\thttps://instagram.com/bronny
+38\thttps://www.basketball-reference.com/players/h/hukpoar01.html\tAriel Hukporti\thttps://www.basketball-reference.com/boxscores/202410220BOS.html\tOct 22, '24, NYK @ BOS\tCenter\tNew York Knicks\t22\t1\t25\t217\t2\t58\t1,955,377\t86\tCap Hit\t111\t1\t13\t1\t39\t7-0\t246\t213\tLeft\t\t\tDallas Mavericks\t2024\t\thttps://instagram.com/arielhukporti
+39\thttps://www.basketball-reference.com/players/w/wallake01.html\tKeaton Wallace\thttps://www.basketball-reference.com/boxscores/202410270OKC.html\tOct 27, '24, ATL @ OKC\tPoint Guard\t\t25\t1\t31\t501\t\t\t2,296,274\t83\tCap Hit\t218\t3\t14\t3\t38\t6-3\t185\t190\tLeft\tTexas-San Antonio\tRichardson in Richardson, Texas\t\t\t\thttps://instagram.com/hollywood.suavae
+40\thttps://www.basketball-reference.com/players/s/smithty02.html\tTyler Smith\thttps://www.basketball-reference.com/boxscores/202410230PHI.html\tOct 23, '24, MIL @ PHI\tPower Forward\tHouston Rockets\t20\t1\t23\t122\t2\t33\t2,040,677\t85\tCash\t60\t0\t11\t1\t38\t6-9\t224\t206\tLeft\t\tGeorge Bush in Richmond, Texas , Overtime Elite Academy in Atlanta, Georgia\tMilwaukee Bucks\t2024\t\thttps://instagram.com/showtimety.11
+41\thttps://www.basketball-reference.com/players/j/johnske10.html\tKeshad Johnson\thttps://www.basketball-reference.com/boxscores/202412020BOS.html\tDec 2, '24, MIA @ BOS\tSmall Forward\tMiami Heat\t23\t1\t16\t98\t\t\t1,955,377\t86\tCap Hit\t50\t0\t8\t1\t37\t6-6\t225\t198\tRight\tSan Diego State\tEnvision Academy of Arts & Technology in Oakland, California , San Leandro in San Leandro, California\t\t\t\thttps://instagram.com/kj_showtime0
+42\thttps://www.basketball-reference.com/players/c/chrisca02.html\tCam Christie\thttps://www.basketball-reference.com/boxscores/202412040LAC.html\tDec 4, '24, LAC vs. MIN\tShooting Guard\tLos Angeles Clippers\t19\t1\t13\t59\t2\t46\t1,955,377\t86\tCap Hit\t30\t0\t7\t0\t36\t6-5\t190\t196\tRight\tMinnesota\tRolling Meadows in Rolling Meadows, Illinois\tLos Angeles Clippers\t2024\t\thttps://instagram.com/_cameronchristie_
+43\thttps://www.basketball-reference.com/players/s/scheiba01.html\tBaylor Scheierman\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, BOS @ WAS\tShooting Guard\tBoston Celtics\t24\t1\t31\t384\t1\t30\t2,619,000\t81\tCap Hit\t147\t2\t12\t2\t36\t6-6\t205\t198\tLeft\tSouth Dakota State\tAurora in Aurora, Nebraska\tBoston Celtics\t2024\thttps://www.tiktok.com/@baylor_scheierman\thttps://instagram.com/baylorrr3
+44\thttps://www.basketball-reference.com/players/s/shannte01.html\tTerrence Shannon Jr.\thttps://www.basketball-reference.com/boxscores/202411020SAS.html\tNov 2, '24, MIN @ SAS\tShooting Guard\tMinnesota Timberwolves\t24\t1\t32\t339\t1\t27\t2,674,080\t80\tCap Hit\t127\t1\t12\t2\t36\t6-6\t215\t198\tLeft\tTexas Tech\tLincoln Park in Chicago, Illinois , IMG Academy in Bradenton, Florida\tMinnesota Timberwolves\t2024\t\thttps://instagram.com/sn1pert
+45\thttps://www.basketball-reference.com/players/d/dasiltr01.html\tTristan Da Silva\thttps://www.basketball-reference.com/boxscores/202410230MIA.html\tOct 23, '24, ORL @ MIA\tSmall Forward\tOrlando Magic\t23\t1\t74\t1629\t1\t18\t3,809,520\t72\tCap Hit\t428\t5\t19\t6\t36\t6-8\t217\t203\tRight\tColorado\t\tOrlando Magic\t2024\t\thttps://instagram.com/tristan.da.silva
+46\thttps://www.basketball-reference.com/players/s/spencca01.html\tCam Spencer\thttps://www.basketball-reference.com/boxscores/202411200MEM.html\tNov 20, '24, MEM vs. PHI\tShooting Guard\tMemphis Grizzlies\t24\t1\t25\t252\t2\t53\t2,537,989\t81\tCap Hit\t99\t1\t10\t1\t36\t6-3\t205\t190\tRight\tLoyola (MD)\tBoy's Latin School of Maryland in Baltimore, Maryland\tDetroit Pistons\t2024\t\t
+47\thttps://www.basketball-reference.com/players/k/klintbo01.html\tBobi Klintman\thttps://www.basketball-reference.com/boxscores/202501080BRK.html\tJan 8, '25, DET @ BRK\tSmall Forward\tDetroit Pistons\t21\t1\t8\t42\t2\t37\t1,955,377\t86\tCap Hit\t21\t0\t4\t0\t36\t6-9\t225\t206\tRight\tWake Forest\tSunrise Christian Academy in Bel Aire, Kansas\tMinnesota Timberwolves\t2024\thttps://www.tiktok.com/@bobiklintman\thttps://instagram.com/bobiklintman
+48\thttps://www.basketball-reference.com/players/m/mitchaj01.html\tAjay Mitchell\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, OKC @ DEN\tShooting Guard\tOklahoma City Thunder\t22\t1\t36\t597\t2\t38\t3,000,000\t78\tCap Hit\t199\t2\t12\t3\t35\t6-4\t190\t193\tLeft\tUC Santa Barbara\t\tNew York Knicks\t2024\t\thttps://instagram.com/thatboyjay_3
+49\thttps://www.basketball-reference.com/players/k/knechda01.html\tDalton Knecht\thttps://www.basketball-reference.com/boxscores/202410220LAL.html\tOct 22, '24, LAL vs. MIN\tSmall Forward\tLos Angeles Lakers\t23\t1\t78\t1494\t1\t17\t4,010,160\t70\tCap Hit\t373\t5\t19\t5\t35\t6-6\t215\t198\tRight\tNortheastern Junior College\tPrairie View in Henderson, Colorado\tLos Angeles Lakers\t2024\thttps://www.tiktok.com/@dalton.knecht1\thttps://instagram.com/daltonknecht3
+50\thttps://www.basketball-reference.com/players/n/nfalyda01.html\tN'Faly Dante\thttps://www.basketball-reference.com/boxscores/202503030OKC.html\tMar 3, '25, HOU @ OKC\tCenter\tAtlanta Hawks\t23\t1\t4\t51\t\t\t2,048,494\t85\tCap Hit\t25\t0\t2\t0\t35\t6-11\t230\t211\tRight\tOregon\tSunrise Christian Academy in Bel Aire, Kansas\t\t\thttps://www.tiktok.com/@nfalydante_12\thttps://instagram.com/nfaly_dante12
+51\thttps://www.basketball-reference.com/players/w/walteja01.html\tJa'Kobe Walter\thttps://www.basketball-reference.com/boxscores/202411010TOR.html\tNov 1, '24, TOR vs. LAL\tShooting Guard\tToronto Raptors\t20\t1\t52\t1103\t1\t19\t3,638,160\t73\tCap Hit\t303\t4\t14\t4\t35\t6-4\t180\t193\tRight\tBaylor\tMcKinney in McKinney, Texas , Link Year Prep in Branson, Missouri\tToronto Raptors\t2024\thttps://www.tiktok.com/@jakobeclone\thttps://instagram.com/_wubbs
+52\thttps://www.basketball-reference.com/players/j/johnsaj01.html\tAJ Johnson\thttps://www.basketball-reference.com/boxscores/202410230PHI.html\tOct 23, '24, MIL @ PHI\tShooting Guard\tWashington Wizards\t20\t1\t29\t639\t1\t23\t3,090,480\t77\tCap Hit\t207\t2\t9\t3\t34\t6-5\t160\t196\tRight\t\tSan Joaquin Memorial in Fresno, California , Taft in Woodland Hills, California\tMilwaukee Bucks\t2024\thttps://www.tiktok.com/@ajxwrld\thttps://instagram.com/aj_johnson04
+53\thttps://www.basketball-reference.com/players/t/tysonja01.html\tJaylon Tyson\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, CLE @ TOR\tShooting Guard\tCleveland Cavaliers\t22\t1\t47\t453\t1\t20\t3,492,480\t74\tCap Hit\t130\t1\t13\t2\t34\t6-6\t215\t198\tRight\tTexas\tJohn Paul II in Plano, Texas\tCleveland Cavaliers\t2024\t\thttps://instagram.com/JT20
+54\thttps://www.basketball-reference.com/players/d/dadiepa01.html\tPacome Dadiet\thttps://www.basketball-reference.com/boxscores/202410220BOS.html\tOct 22, '24, NYK @ BOS\tShooting Guard\tNew York Knicks\t19\t1\t18\t111\t1\t25\t2,847,600\t79\tCap Hit\t39\t0\t6\t1\t34\t6-9\t210\t206\tRight\t\t\tNew York Knicks\t2024\t\thttps://instagram.com/pax_1_
+55\thttps://www.basketball-reference.com/players/c/carrica01.html\tBub Carrington\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tPoint Guard\tWashington Wizards\t19\t1\t82\t2458\t1\t14\t4,677,600\t65\tCap Hit\t525\t7\t18\t7\t33\t6-4\t190\t193\tRight\tPitt\tSaint Frances Academy in Baltimore, Maryland\tPortland Trail Blazers\t2024\t\thttps://instagram.com/noigbub
+56\thttps://www.basketball-reference.com/players/w/wareke01.html\tKel'el Ware\thttps://www.basketball-reference.com/boxscores/202410230MIA.html\tOct 23, '24, MIA vs. ORL\tCenter\tMiami Heat\t20\t1\t64\t1422\t1\t15\t4,443,360\t67\tCap Hit\t320\t4\t14\t4\t32\t7-0\t230\t213\tRight\tOregon\tNorth Little Rock in North Little Rock, Arkansas\tMiami Heat\t2024\thttps://www.tiktok.com/@kelel.ware8\thttps://instagram.com/kelelware_
+57\thttps://www.basketball-reference.com/players/m/mccaija01.html\tJared McCain\thttps://www.basketball-reference.com/boxscores/202410230PHI.html\tOct 23, '24, PHI vs. MIL\tShooting Guard and Point Guard\tPhiladelphia 76ers\t20\t1\t23\t592\t1\t16\t4,221,360\t68\tCap Hit\t140\t2\t5\t2\t30\t6-3\t195\t190\tRight\tDuke\tCentennial in Corona, California\tPhiladelphia 76ers\t2024\thttps://www.tiktok.com/@jaredmccain\thttps://instagram.com/jmccain24
+58\thttps://www.basketball-reference.com/players/b/buzelma01.html\tMatas Buzelis\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, CHI @ NOP\tSmall Forward and Power Forward\tChicago Bulls\t20\t1\t80\t1511\t1\t11\t5,455,560\t59\tCap Hit\t277\t3\t15\t4\t29\t6-8\t209\t203\tRight\t\tHinsdale Central in Hinsdale, Illinois , Brewster Academy in Wolfeboro, New Hampshire , Sunrise Christian Academy in Bel Aire, Kansas\tChicago Bulls\t2024\thttps://www.tiktok.com/@matasbuzelis\thttps://instagram.com/matasbuzelis
+59\thttps://www.basketball-reference.com/players/c/cartede02.html\tDevin Carter\thttps://www.basketball-reference.com/boxscores/202501030SAC.html\tJan 3, '25, SAC vs. MEM\tPoint Guard\tSacramento Kings\t22\t1\t36\t396\t1\t13\t4,923,720\t63\tCap Hit\t80\t1\t7\t1\t28\t6-2\t195\t188\tRight\tSouth Carolina\tDoral Academy Preparatory School in Doral, Florida , Brewster Academy in Wolfeboro, New Hampshire\tSacramento Kings\t2024\t\thttps://instagram.com/devincart3r
+60\thttps://www.basketball-reference.com/players/w/willico04.html\tCody Williams\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, UTA vs. MEM\tShooting Guard\tUtah Jazz\t20\t1\t50\t1060\t1\t10\t5,742,480\t57\tCap Hit\t185\t2\t9\t2\t26\t6-8\t190\t203\tRight\tColorado\tPerry in Gilbert, Arizona\tUtah Jazz\t2024\t\thttps://instagram.com/codywilliams1011
+61\thttps://www.basketball-reference.com/players/e/edeyza01.html\tZach Edey\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tCenter\tMemphis Grizzlies\t22\t1\t66\t1416\t1\t9\t6,045,000\t55\tCap Hit\t234\t3\t11\t3\t26\t7-3\t305\t221\tRight\tPurdue\tLeaside in Toronto, Canada, IMG Academy in Bradenton, Florida\tMemphis Grizzlies\t2024\t\thttps://instagram.com/zach_edey
+62\thttps://www.basketball-reference.com/players/d/dilliro01.html\tRob Dillingham\thttps://www.basketball-reference.com/boxscores/202411020SAS.html\tNov 2, '24, MIN @ SAS\tPoint Guard\tMinnesota Timberwolves\t20\t1\t49\t516\t1\t8\t6,576,120\t50\tCap Hit\t78\t1\t7\t1\t23\t6-2\t175\t188\tRight\tKentucky\tCombine Academy in Lincolnton, North Carolina , Overtime Elite Academy in Atlanta, Georgia\tSan Antonio Spurs\t2024\thttps://www.tiktok.com/@robbslimefr\thttps://instagram.com/robwitdashifts
+63\thttps://www.basketball-reference.com/players/c/clingdo01.html\tDonovan Clingan\thttps://www.basketball-reference.com/boxscores/202410230POR.html\tOct 23, '24, POR vs. GSW\tCenter\tPortland Trail Blazers\t20\t1\t67\t1324\t1\t7\t7,178,400\t46\tCap Hit\t184\t2\t9\t2\t22\t7-2\t280\t218\tRight\tUConn\tCentral in Bristol, Connecticut\tPortland Trail Blazers\t2024\thttps://www.tiktok.com/@donovan.clingan?lang=en\thttps://instagram.com/donovanclingan
+64\thttps://www.basketball-reference.com/players/s/salauti01.html\tTidjane Salaün\thttps://www.basketball-reference.com/boxscores/202410260CHO.html\tOct 26, '24, CHO vs. MIA\tPower Forward\tCharlotte Hornets\t19\t1\t60\t1244\t1\t6\t7,863,240\t41\tCap Hit\t158\t2\t8\t2\t19\t6-10\t207\t208\tRight\t\t\tCharlotte Hornets\t2024\thttps://www.tiktok.com/@tidjanesalaun31\thttps://instagram.com/tidjane.sln
+65\thttps://www.basketball-reference.com/players/h/hollaro01.html\tRon Holland\thttps://www.basketball-reference.com/boxscores/202410230DET.html\tOct 23, '24, DET vs. IND\tSmall Forward\tDetroit Pistons\t19\t1\t81\t1266\t1\t5\t8,657,280\t35\tCap Hit\t146\t2\t9\t2\t17\t6-8\t206\t203\tRight\t\tDuncanville in Duncanville, Texas\tDetroit Pistons\t2024\thttps://www.tiktok.com/@_ronhoops\thttps://instagram.com/_ronhoops
+66\thttps://www.basketball-reference.com/players/c/castlst01.html\tStephon Castle\thttps://www.basketball-reference.com/boxscores/202410240DAL.html\tOct 24, '24, SAS @ DAL\tPoint Guard and Shooting Guard\tSan Antonio Spurs\t20\t1\t81\t2162\t1\t4\t9,560,520\t28\tCap Hit\t226\t3\t8\t3\t15\t6-6\t215\t198\tRight\tUConn\tNewton in Covington, Georgia\tSan Antonio Spurs\t2024\thttps://www.tiktok.com/@stephoncastle\thttps://instagram.com/stephcastle
+67\thttps://www.basketball-reference.com/players/s/sheppre01.html\tReed Sheppard\thttps://www.basketball-reference.com/boxscores/202410230HOU.html\tOct 23, '24, HOU vs. CHO\tPoint Guard and Shooting Guard\tHouston Rockets\t20\t1\t52\t654\t1\t3\t10,603,560\t20\tCap Hit\t62\t1\t5\t1\t10\t6-2\t185\t188\tRight\tKentucky\tNorth Laurel in London, Kentucky\tHouston Rockets\t2024\t\thttps://instagram.com/reedsheppard3
+68\thttps://www.basketball-reference.com/players/s/sarral01.html\tAlex Sarr\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tCenter and Power Forward\tWashington Wizards\t19\t1\t67\t1814\t1\t2\t11,808,240\t11\tCap Hit\t154\t2\t6\t2\t7\t7-0\t205\t213\tRight\t\tOvertime Elite Academy in Atlanta, Georgia\tWashington Wizards\t2024\thttps://www.tiktok.com/@alexandresarr20\thttps://instagram.com/alexsarr
+69\thttps://www.basketball-reference.com/players/r/risacza01.html\tZaccharie Risacher\thttps://www.basketball-reference.com/boxscores/202410230ATL.html\tOct 23, '24, ATL vs. BRK\tSmall Forward\tAtlanta Hawks\t19\t1\t75\t1843\t1\t1\t13,197,720\t0\tCap Hit\t140\t2\t6\t2\t2\t6-8\t200\t203\tRight\t\t\tAtlanta Hawks\t2024\t\thttps://instagram.com/_zacch_10
+70\thttps://www.basketball-reference.com/players/b/baglema02.html\tMarcus Bagley\thttps://www.basketball-reference.com/boxscores/202503240NOP.html\tMar 24, '25, PHI @ NOP\tSmall Forward\t\t23\t1\t10\t253\t\t\t\t\t\t\t0\t\t0\t0\t6-8\t215\t203\tRight\tArizona State\tSierra Canyon in Chatsworth, California , Sheldon in Sacramento, California\t\t\thttps://www.tiktok.com/@marcusbagley1\thttps://instagram.com/marcus
+70\thttps://www.basketball-reference.com/players/b/baughda01.html\tDamion Baugh\thttps://www.basketball-reference.com/boxscores/202502120ORL.html\tFeb 12, '25, CHO @ ORL\tShooting Guard\t\t24\t1\t15\t370\t\t\t\t\t\t\t0\t\t0\t0\t6-4\t194\t193\tRight\tMemphis\tCane Ridge in Antioch, Tennessee , Tennesse Preparatory Academy in Memphis, Tennessee\t\t\t\thttps://instagram.com/_swaggyd2_
+70\thttps://www.basketball-reference.com/players/b/beekmre01.html\tReece Beekman\thttps://www.basketball-reference.com/boxscores/202410290GSW.html\tOct 29, '24, GSW vs. NOP\tPoint Guard\t\t23\t1\t36\t469\t\t\t\t\t\t\t0\t\t0\t0\t6-3\t190\t190\tRight\tVirginia\tScotlandville Magnet in Baton Rouge, Louisiana\t\t\t\thttps://instagram.com/reece.2
+70\thttps://www.basketball-reference.com/players/b/bridgja01.html\tJalen Bridges\thttps://www.basketball-reference.com/boxscores/202411130SAC.html\tNov 13, '24, PHO @ SAC\tSmall Forward\t\t23\t1\t8\t30\t\t\t\t\t\t\t0\t\t0\t0\t6-7\t225\t201\tRight\tWest Virginia\tFairmont Senior in Fairmont, West Virginia\t\t\thttps://www.tiktok.com/@jalenbridges15\thttps://instagram.com/bigbucketjb
+70\thttps://www.basketball-reference.com/players/b/brookke02.html\tKeion Brooks Jr.\thttps://www.basketball-reference.com/boxscores/202502050DEN.html\tFeb 5, '25, NOP @ DEN\tSmall Forward\t\t24\t1\t14\t332\t\t\t\t\t\t\t0\t\t0\t0\t6-7\t210\t201\tRight\tKentucky\tLa Lumiere School in La Porte, Indiana\t\t\t\thttps://instagram.com/keionb
+70\thttps://www.basketball-reference.com/players/c/chomcul01.html\tUlrich Chomche\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tPower Forward\t\t19\t1\t7\t32\t2\t57\t\t\t\t\t0\t\t0\t0\t6-11\t235\t211\tRight\t\t\tMemphis Grizzlies\t2024\thttps://www.tiktok.com/@ulrich_chomche\thttps://instagram.com/ulrich__chomche
+70\thttps://www.basketball-reference.com/players/c/colliyu01.html\tYuri Collins\thttps://www.basketball-reference.com/boxscores/202502230GSW.html\tFeb 23, '25, GSW vs. DAL\tPoint Guard\t\t23\t1\t2\t16\t\t\t\t\t\t\t0\t\t0\t0\t6-0\t190\t183\tRight\tSaint Louis\tSt. Mary's in St. Louis, Missouri\t\t\t\thttps://instagram.com/unknownyc1
+70\thttps://www.basketball-reference.com/players/c/cuiyo01.html\tCui Yongxi\thttps://www.basketball-reference.com/boxscores/202410270BRK.html\tOct 27, '24, BRK vs. MIL\tShooting Guard\t\t21\t1\t5\t10\t\t\t\t\t\t\t0\t\t0\t0\t6-5\t190\t196\tRight\t\t\t\t\t\thttps://instagram.com/jacky_cui_
+70\thttps://www.basketball-reference.com/players/d/dennira01.html\tRayJ Dennis\thttps://www.basketball-reference.com/boxscores/202501100IND.html\tJan 10, '25, IND vs. GSW\tPoint Guard\t\t23\t1\t11\t70\t\t\t\t\t\t\t0\t\t0\t0\t6-1\t180\t185\tRight\tBoise State\tMontini Catholic in Lombard, Illinois , Oswego East in Oswego, Illinois\t\t\thttps://www.tiktok.com/@rayjdennis\thttps://instagram.com/rayjdennis10
+70\thttps://www.basketball-reference.com/players/d/ducasal01.html\tAlex Ducas\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, OKC @ DEN\tShooting Guard\t\t24\t1\t21\t125\t\t\t\t\t\t\t0\t\t0\t0\t6-7\t220\t201\tRight\tSaint Mary's\tAustralian Institute of Sport in Canberra, Australia\t\t\t\thttps://instagram.com/alexducas
+70\thttps://www.basketball-reference.com/players/e/edwarje01.html\tJesse Edwards\thttps://www.basketball-reference.com/boxscores/202503020PHO.html\tMar 2, '25, MIN @ PHO\tCenter\t\t24\t1\t2\t5\t\t\t\t\t\t\t0\t\t0\t0\t7-0\t236\t213\tRight\tWest Virginia\tIMG Academy in Bradenton, Florida\t\t\thttps://www.tiktok.com/@_jesse.edwards\thttps://instagram.com/jesse__edwards
+70\thttps://www.basketball-reference.com/players/g/gortmja01.html\tJazian Gortman\thttps://www.basketball-reference.com/boxscores/202410260PHO.html\tOct 26, '24, DAL @ PHO\tPoint Guard\t\t21\t1\t16\t57\t\t\t\t\t\t\t0\t\t0\t0\t6-2\t184\t188\tRight\t\tKeenan in Columbia, South Carolina , Overtime Elite Academy in Atlanta, Georgia\t\t\t\t
+70\thttps://www.basketball-reference.com/players/h/hallpj01.html\tPJ Hall\thttps://www.basketball-reference.com/boxscores/202411170MEM.html\tNov 17, '24, DEN @ MEM\tCenter\t\t22\t1\t19\t66\t\t\t\t\t\t\t0\t\t0\t0\t6-8\t245\t203\tRight\tClemson\tDorman in Roebuck, South Carolina\t\t\thttps://www.tiktok.com/@pjhall_24\thttps://instagram.com/pjhall_24
+70\thttps://www.basketball-reference.com/players/h/harklej01.html\tElijah Harkless\thttps://www.basketball-reference.com/boxscores/202501110PHO.html\tJan 11, '25, UTA @ PHO\tShooting Guard\tUtah Jazz\t24\t1\t10\t138\t\t\t\t\t\t\t0\t\t0\t0\t6-3\t195\t190\tRight\tCal State Northridge\tEtiwanda in Rancho Cucamonga, California\t\t\t\t
+70\thttps://www.basketball-reference.com/players/j/jonesdi01.html\tDillon Jones\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, OKC @ DEN\tSmall Forward\t\t23\t1\t54\t552\t1\t26\t\t\t\t\t0\t\t0\t0\t6-5\t235\t196\tRight\tWeber State\tSunrise Christian Academy in Bel Aire, Kansas\tWashington Wizards\t2024\t\thttps://instagram.com/gfb.dj
+70\thttps://www.basketball-reference.com/players/k/kawamyu01.html\tYuki Kawamura\thttps://www.basketball-reference.com/boxscores/202410250HOU.html\tOct 25, '24, MEM @ HOU\tPoint Guard\t\t23\t1\t22\t93\t\t\t\t\t\t\t0\t\t0\t0\t5-7\t159\t170\tRight\t\t\t\t\t\thttps://instagram.com/kawamurayuki_8
+70\thttps://www.basketball-reference.com/players/k/kelleky01.html\tKylor Kelley\thttps://www.basketball-reference.com/boxscores/202501270DAL.html\tJan 27, '25, DAL vs. WAS\tCenter\t\t27\t1\t11\t126\t\t\t\t\t\t\t0\t\t0\t0\t7-0\t215\t213\tRight\tOregon State\tGervais in Gervais, Oregon\t\t\thttps://www.tiktok.com/@k3ll3y24\t
+70\thttps://www.basketball-reference.com/players/l/leonsma01.html\tMalevy Leons\thttps://www.basketball-reference.com/boxscores/202411010POR.html\tNov 1, '24, OKC @ POR\tSmall Forward\t\t25\t1\t6\t21\t\t\t\t\t\t\t0\t\t0\t0\t6-9\t210\t206\tRight\tMineral Area College\t\t\t\t\thttps://instagram.com/malevyleons
+70\thttps://www.basketball-reference.com/players/m/martija02.html\tJaylen Martin\thttps://www.basketball-reference.com/boxscores/202410270BRK.html\tOct 27, '24, BRK vs. MIL\tSmall Forward\t\t21\t1\t16\t239\t\t\t\t\t\t\t0\t\t0\t0\t6-6\t216\t198\tRight\t\tFlorida in Tallahassee, Florida\t\t\t\thttps://instagram.com/jaylenamir
+70\thttps://www.basketball-reference.com/players/m/mcveija01.html\tJack McVeigh\thttps://www.basketball-reference.com/boxscores/202411060HOU.html\tNov 6, '24, HOU vs. SAS\tPower Forward\t\t28\t1\t9\t43\t\t\t\t\t\t\t0\t\t0\t0\t6-8\t215\t203\tRight\tNebraska\tThe Southport School in Southport, Australia, Lake Ginninderra in Canberra, Australia\t\t\thttps://www.tiktok.com/@jackmctrey\thttps://instagram.com/jackmctrey
+70\thttps://www.basketball-reference.com/players/m/minixri01.html\tRiley Minix\thttps://www.basketball-reference.com/boxscores/202411060HOU.html\tNov 6, '24, SAS @ HOU\tSmall Forward\tSan Antonio Spurs\t24\t1\t1\t7\t\t\t\t\t\t\t0\t\t0\t0\t6-7\t230\t201\tRight\tSoutheastern University\tVero Beach in Vero Beach, Florida\t\t\t\thttps://instagram.com/riley.minix
+70\thttps://www.basketball-reference.com/players/n/newtotr01.html\tTristen Newton\thttps://www.basketball-reference.com/boxscores/202411180TOR.html\tNov 18, '24, IND @ TOR\tShooting Guard\t\t23\t1\t8\t16\t2\t49\t\t\t\t\t0\t\t0\t0\t6-5\t190\t196\tRight\tEast Carolina University\tBurges in El Paso, Texas\tIndiana Pacers\t2024\t\thttps://instagram.com/tristenewton
+70\thttps://www.basketball-reference.com/players/n/norrimi01.html\tMiles Norris\thttps://www.basketball-reference.com/boxscores/202503060BOS.html\tMar 6, '25, BOS vs. PHI\tPower Forward\t\t24\t1\t3\t35\t\t\t\t\t\t\t0\t\t0\t0\t6-7\t220\t201\tRight\tOregon\tMater Dei Catholic in Chula Vista, California , Helix in La Mesa, California , Brewster Academy in Wolfeboro, New Hampshire\t\t\t\thttps://instagram.com/tgo.miles
+70\thttps://www.basketball-reference.com/players/o/olivaqu01.html\tQuincy Olivari\thttps://www.basketball-reference.com/boxscores/202412080LAL.html\tDec 8, '24, LAL vs. POR\tPoint Guard\t\t23\t1\t2\t10\t\t\t\t\t\t\t0\t\t0\t0\t6-2\t201\t188\tRight\tRice University\tWestlake in Atlanta, Georgia\t\t\t\thttps://instagram.com/quincyolivari
+70\thttps://www.basketball-reference.com/players/p/pullizy01.html\tZyon Pullin\thttps://www.basketball-reference.com/boxscores/202502030MEM.html\tFeb 3, '25, MEM vs. SAS\tShooting Guard\t\t23\t1\t3\t3\t\t\t\t\t\t\t0\t\t0\t0\t6-4\t206\t193\tRight\tUniversity of California, Riverside\tCollege Park in Pleasant Hill, California\t\t\t\thttps://instagram.com/zyonpullin
+70\thttps://www.basketball-reference.com/players/r/reeseal01.html\tAlex Reese\thttps://www.basketball-reference.com/boxscores/202410270OKC.html\tOct 27, '24, OKC vs. ATL\tPower Forward\t\t25\t1\t15\t216\t\t\t\t\t\t\t0\t\t0\t0\t6-9\t245\t206\tRight\tAlabama\tPelham in Pelham, Alabama\t\t\t\thttps://instagram.com/reeseyfor3
+70\thttps://www.basketball-reference.com/players/r/robbili01.html\tLiam Robbins\thttps://www.basketball-reference.com/boxscores/202410310MEM.html\tOct 31, '24, MIL @ MEM\tCenter\t\t25\t1\t13\t57\t\t\t\t\t\t\t0\t\t0\t0\t7-0\t250\t213\tRight\tDrake University\tAssumption in Davenport, Iowa , Sunrise Christian Academy in Bel Aire, Kansas\t\t\t\thttps://instagram.com/liamrobbins0
+70\thttps://www.basketball-reference.com/players/r/roweja01.html\tJackson Rowe\thttps://www.basketball-reference.com/boxscores/202502050UTA.html\tFeb 5, '25, GSW @ UTA\tPower Forward\t\t28\t1\t6\t52\t\t\t\t\t\t\t0\t\t0\t0\t6-6\t210\t198\tRight\tCal State Fullerton\tWasatch Academy in Mount Pleasant, Utah\t\t\t\thttps://instagram.com/jacksonraw
+70\thttps://www.basketball-reference.com/players/s/simpskj01.html\tKJ Simpson\thttps://www.basketball-reference.com/boxscores/202411040MIN.html\tNov 4, '24, CHO @ MIN\tPoint Guard\tCharlotte Hornets\t22\t1\t36\t842\t2\t42\t\t\t\t\t0\t\t0\t0\t6-2\t189\t188\tRight\tColorado\tChaminade College Prep in West Hills, California\tCharlotte Hornets\t2024\thttps://www.tiktok.com/@kjsimpson.2\thttps://instagram.com/kj.dth
+70\thttps://www.basketball-reference.com/players/s/simsja01.html\tJaylen Sims\thttps://www.basketball-reference.com/boxscores/202504040CHO.html\tApr 4, '25, CHO vs. SAC\tShooting Guard\t\t26\t1\t6\t112\t\t\t\t\t\t\t0\t\t0\t0\t6-6\t210\t198\tRight\tUNC Wilmington\tUnited Faith Christian in Charlotte, North Carolina\t\t\t\thttps://instagram.com/j.sims30
+70\thttps://www.basketball-reference.com/players/s/smithto05.html\tTolu Smith\thttps://www.basketball-reference.com/boxscores/202504130MIL.html\tApr 13, '25, DET @ MIL\tPower Forward\tDetroit Pistons\t24\t1\t1\t22\t\t\t\t\t\t\t0\t\t0\t0\t6-11\t254\t211\tRight\tWestern Kentucky\tBay in Bay St. Louis, Mississippi , Kahuku in Kahuku, Hawaii\t\t\thttps://www.tiktok.com/@tolusmith35\thttps://instagram.com/t0lu_
+70\thttps://www.basketball-reference.com/players/t/tomlina01.html\tNae'Qwan Tomlin\thttps://www.basketball-reference.com/boxscores/202502200BRK.html\tFeb 20, '25, CLE @ BRK\tPower Forward\tCleveland Cavaliers\t24\t1\t5\t63\t\t\t\t\t\t\t0\t\t0\t0\t6-8\t210\t203\tRight\tMonroe Community College\t\t\t\t\thttps://instagram.com/nae_ratty
+70\thttps://www.basketball-reference.com/players/a/armeltr01.html\tArmel Traoré\thttps://www.basketball-reference.com/boxscores/202411160NOP.html\tNov 16, '24, LAL @ NOP\tSmall Forward\t\t22\t1\t9\t67\t\t\t\t\t\t\t0\t\t0\t0\t6-9\t246\t206\tRight\t\t\t\t\t\thttps://www.tiktok.com/@armel_traore94\thttps://instagram.com/armel_traore35
+70\thttps://www.basketball-reference.com/players/w/watsoan02.html\tAnton Watson\thttps://www.basketball-reference.com/boxscores/202503100SAC.html\tMar 10, '25, NYK @ SAC\tSmall Forward\t\t24\t1\t9\t22\t2\t54\t\t\t\t\t0\t\t0\t0\t6-8\t225\t203\tRight\tGonzaga\tGonzaga Prep in Spokane, Washington\tBoston Celtics\t2024\t\thttps://instagram.com/antonwatson22
+70\thttps://www.basketball-reference.com/players/w/wheelph02.html\tPhillip Wheeler\thttps://www.basketball-reference.com/boxscores/202503260PHI.html\tMar 26, '25, PHI vs. WAS\tPower Forward\t\t22\t1\t5\t44\t\t\t\t\t\t\t0\t\t0\t0\t6-8\t185\t203\tRight\t\tRanney School in Tinton Falls, New Jersey\t\t\t\thttps://instagram.com/phillipwheeler23`;
+
+      function toNum(x){
+        if(x == null) return null;
+        var s = String(x).trim();
+        if(!s) return null;
+        // remove commas, currency symbols
+        s = s.replace(/[$,]/g,'');
+        var n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      }
+
+      function safeStr(x){
+        return (x == null) ? '' : String(x).trim();
+      }
+
+      function headshotFromPlayerUrl(url){
+        // Basketball-Reference headshot convention:
+        // https://www.basketball-reference.com/req/202106291/images/headshots/PLAYERID.jpg
+        // PLAYERID = last path segment in player url (e.g., reevean01.html -> reevean01)
+        var m = safeStr(url).match(/\/players\/[a-z]\/([^\/]+)\.html/i);
+        if(!m) return '';
+        return 'https://www.basketball-reference.com/req/202106291/images/headshots/' + m[1] + '.jpg';
+      }
+
+      function parseTSV(raw){
+        var lines = raw.split(/\r?\n/).filter(function(l){ return l.trim().length > 0; });
+        if(lines.length < 2) return [];
+        var headers = lines[0].split('\t').map(function(h){ return h.trim(); });
+
+        var idx = {};
+        headers.forEach(function(h,i){ idx[h] = i; });
+
+        function get(row, key){
+          var i = idx[key];
+          return (i == null) ? '' : (row[i] == null ? '' : row[i]);
+        }
+
+        var out = [];
+        for(var li=1; li<lines.length; li++){
+          var row = lines[li].split('\t');
+          var playerUrl = safeStr(get(row,'Player url'));
+          var player = safeStr(get(row,'Player'));
+          if(!player) continue;
+
+          var games = toNum(get(row,'Games')) || 0;
+          var minutes = toNum(get(row,'Minutes Played')) || 0;
+
+          var salary = toNum(get(row,'Salary 2025'));
+          if(salary == null) salary = 0;
+
+          var minutesPerMillion = toNum(get(row,'MinutesPerMillion'));
+          var gamesPerMillion = toNum(get(row,'GamesPerMillion'));
+          var finalScore = toNum(get(row,'Final Score'));
+
+          var costPerMinute = null;
+          if(salary > 0 && minutes > 0){
+            costPerMinute = salary / minutes;
+          }
+
+          out.push({
+            rawRank: toNum(get(row,'Rank')) || 999,
+            playerUrl: playerUrl,
+            player: player,
+            position: safeStr(get(row,'Position')),
+            team: safeStr(get(row,'Team')) || '—',
+            age: toNum(get(row,'Age')),
+            games: games,
+            minutes: minutes,
+            salary: salary,
+            capType: safeStr(get(row,'Cap hit/Cash?')),
+            minutesPerMillion: minutesPerMillion,
+            gamesPerMillion: gamesPerMillion,
+            finalScore: finalScore,
+            costPerMinute: costPerMinute,
+            headshot: headshotFromPlayerUrl(playerUrl)
+          });
+        }
+        return out;
+      }
+
+      var data = parseTSV(RAW_TSV);
+
+      // =======================
+      // 2) Rendering
+      // =======================
+      var rowsEl = root.querySelector('.rows-js');
+      var emptyEl = root.querySelector('.empty-js');
+      var metricHead = root.querySelector('.metric-head-js');
+      var summaryEl = root.querySelector('.summary-js');
+      var searchInput = root.querySelector('.search-input-js');
+      var metricBtns = root.querySelectorAll('.metric-btn-js');
+
+            var state = {
+        metric: 'finalScore',
+        dir: 'desc',
+        query: ''
+      };
+
+      function fmtInt(n){
+        if(n == null || !Number.isFinite(n)) return '—';
+        return Math.round(n).toLocaleString();
+      }
+      function fmtMoney(n){
+        if(n == null || !Number.isFinite(n)) return '—';
+        return '$' + Math.round(n).toLocaleString();
+      }
+      function fmtMoneyShort(n){
+        if(n == null || !Number.isFinite(n)) return '—';
+        return '$' + Math.round(n).toLocaleString();
+      }
+      function fmtCostPerMinute(n){
+        if(n == null || !Number.isFinite(n)) return '—';
+        // show as dollars per minute (rounded)
+        return '$' + Math.round(n).toLocaleString() + ' / min';
+      }
+
+      function metricLabel(metric){
+        if(metric === 'finalScore') return 'Final Score';
+        if(metric === 'minutesPerMillion') return 'Minutes / $1M';
+        if(metric === 'gamesPerMillion') return 'Games / $1M';
+        if(metric === 'costPerMinute') return 'Cost / minute';
+        return 'Metric';
+      }
+
+      function metricValue(row, metric){
+        var v = row[metric];
+        if(v == null || !Number.isFinite(v)) return null;
+        return v;
+      }
+
+      function searchableText(row){
+        return (
+          (row.player || '') + ' ' +
+          (row.team || '') + ' ' +
+          (row.position || '') + ' ' +
+          (row.capType || '')
+        ).toLowerCase();
+      }
+
+      function applyFilter(list){
+        var q = (state.query || '').trim().toLowerCase();
+        if(!q) return list.slice();
+        return list.filter(function(r){
+          return searchableText(r).indexOf(q) !== -1;
+        });
+      }
+
+      function applySort(list){
+        var metric = state.metric;
+        var dir = state.dir;
+
+        // Ensure stable-ish ordering with rawRank as tie-breaker
+        return list.slice().sort(function(a,b){
+          var av = metricValue(a, metric);
+          var bv = metricValue(b, metric);
+
+          // nulls go last always
+          var an = (av == null) ? -Infinity : av;
+          var bn = (bv == null) ? -Infinity : bv;
+
+          if(av == null && bv == null){
+            return (a.rawRank - b.rawRank);
+          }
+          if(av == null) return 1;
+          if(bv == null) return -1;
+
+          var cmp = (an === bn) ? 0 : (an < bn ? -1 : 1);
+          if(dir === 'desc') cmp = -cmp;
+          if(cmp !== 0) return cmp;
+
+          return (a.rawRank - b.rawRank);
+        });
+      }
+
+      function barScale(list, metric){
+        // Compute min/max across current filtered list for bar scaling.
+        // For "costPerMinute" lower is better, but we still scale 0..1 by value vs max.
+        var vals = [];
+        for(var i=0;i<list.length;i++){
+          var v = metricValue(list[i], metric);
+          if(v == null) continue;
+          vals.push(v);
+        }
+        if(!vals.length){
+          return { min: 0, max: 1 };
+        }
+        var min = Math.min.apply(null, vals);
+        var max = Math.max.apply(null, vals);
+        // avoid divide-by-zero
+        if(min === max){
+          max = min + 1;
+        }
+        return { min:min, max:max };
+      }
+
+      function clamp01(x){
+        if(x < 0) return 0;
+        if(x > 1) return 1;
+        return x;
+      }
+
+      function metricDisplay(row){
+        if(state.metric === 'finalScore'){
+          return (row.finalScore == null) ? '—' : fmtInt(row.finalScore);
+        }
+        if(state.metric === 'minutesPerMillion'){
+          return (row.minutesPerMillion == null) ? '—' : fmtInt(row.minutesPerMillion);
+        }
+        if(state.metric === 'gamesPerMillion'){
+          return (row.gamesPerMillion == null) ? '—' : fmtInt(row.gamesPerMillion);
+        }
+        if(state.metric === 'costPerMinute'){
+          return fmtCostPerMinute(row.costPerMinute);
+        }
+        return '—';
+      }
+
+      function metricSubLabel(){
+        if(state.metric === 'finalScore') return 'Higher = better';
+        if(state.metric === 'minutesPerMillion') return 'Higher = better';
+        if(state.metric === 'gamesPerMillion') return 'Higher = better';
+        if(state.metric === 'costPerMinute') return 'Lower = better';
+        return '';
+      }
+
+      function buildRowHTML(row, rank, scale){
+        var v = metricValue(row, state.metric);
+        var pct;
+
+        if(v == null){
+          pct = 0;
+        } else {
+          // scale by value; for costPerMinute we still fill by relative cost (higher cost => more filled)
+          pct = (v - scale.min) / (scale.max - scale.min);
+          pct = clamp01(pct);
+        }
+
+        // Display rank as computed rank (after filter/sort), plus original table rank for reference
+        var rankHTML = String(rank) + '<small>#' + (row.rawRank || '—') + '</small>';
+
+        var metaBits = [];
+        if(row.team && row.team !== '—') metaBits.push(row.team);
+        if(row.position) metaBits.push(row.position);
+        if(Number.isFinite(row.games)) metaBits.push(fmtInt(row.games) + ' GP');
+        if(Number.isFinite(row.minutes)) metaBits.push(fmtInt(row.minutes) + ' MIN');
+        if(Number.isFinite(row.salary) && row.salary > 0) metaBits.push('Salary ' + fmtMoneyShort(row.salary));
+        if(row.capType) metaBits.push(row.capType);
+
+        var meta = metaBits.join(' • ');
+
+        var alt = (row.player ? (row.player + ' headshot') : 'Player headshot');
+
+        return (
+          '<div class="row row--data" role="row" tabindex="0">' +
+            '<div class="cell-rank" role="cell">' + rankHTML + '</div>' +
+            '<div role="cell" class="player">' +
+              '<span class="avatar" aria-hidden="true">' +
+                (row.headshot
+                  ? '<img src="' + row.headshot + '" alt="' + alt.replace(/"/g,'&quot;') + '" loading="lazy">'
+                  : '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" aria-hidden="true">') +
+              '</span>' +
+              '<a class="player-link" href="' + (row.playerUrl || '#') + '" target="_blank" rel="noopener noreferrer">' +
+                '<div class="pname">' + (row.player || '—') + '</div>' +
+                '<span class="pmeta">' + meta.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>' +
+              '</a>' +
+            '</div>' +
+            '<div role="cell" class="metric">' +
+              '<div class="metric-big">' + metricDisplay(row) + '</div>' +
+              '<div class="pill-wrap">' +
+                '<div class="bar" aria-hidden="true"><span style="transform:scaleX(' + pct.toFixed(4) + ');"></span></div>' +
+                '<span class="label">' + metricSubLabel() + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+
+      function render(){
+        var filtered = applyFilter(data);
+        var sorted = applySort(filtered);
+
+        // Update header label
+        if(metricHead){
+          metricHead.textContent = metricLabel(state.metric);
+        }
+
+        // Compute scale based on filtered+sorted list (bars rescale to current view)
+        var scale = barScale(filtered, state.metric);
+
+        // Rows
+        if(rowsEl){
+          if(!sorted.length){
+            rowsEl.innerHTML = '';
+            if(emptyEl) emptyEl.hidden = false;
+          } else {
+            if(emptyEl) emptyEl.hidden = true;
+            var html = '';
+            for(var i=0;i<sorted.length;i++){
+              html += buildRowHTML(sorted[i], i+1, scale);
+            }
+            rowsEl.innerHTML = html;
+          }
+        }
+
+        // Summary
+        if(summaryEl){
+          var dirTxt = (state.dir === 'desc') ? 'high → low' : 'low → high';
+          summaryEl.innerHTML =
+            '<strong>Sorting:</strong> ' + metricLabel(state.metric) + ' (' + dirTxt + ') • ' +
+            '<strong>Rows:</strong> ' + fmtInt(sorted.length);
+        }
+
+        // Update the little badge on search
+        var k = root.querySelector('.search .k');
+        if(k){
+          var q = (state.query || '').trim();
+          k.textContent = q ? ('Filtered') : ('Full list');
+        }
+      }
+
+      // =======================
+      // 3) Events
+      // =======================
+      metricBtns.forEach(function(btn){
+        btn.addEventListener('click', function(){
+          metricBtns.forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+          btn.setAttribute('aria-pressed','true');
+
+          state.metric = btn.getAttribute('data-metric') || 'finalScore';
+          state.dir = btn.getAttribute('data-dir') || 'desc';
+
+          render();
+        });
+      });
+
+      if(searchInput){
+        searchInput.addEventListener('input', function(){
+          state.query = searchInput.value || '';
+          render();
+        });
+      }
+
+      // =======================
+      // 4) Copy embed code tool
+      // =======================
+      var copyBtn = root.querySelector('.embed-btn-js');
+      var wrap = root.querySelector('.embed-wrap-js');
+      var ta = root.querySelector('.embed-code-js');
+      var status = root.querySelector('.embed-status-js');
+
+      if(copyBtn && wrap && ta){
+        copyBtn.addEventListener('click', function(){
+          wrap.hidden = false;
+          ta.focus();
+          ta.select();
+
+          var copied = false;
+          try { copied = document.execCommand('copy'); } catch(e) { copied = false; }
+
+          if(status){
+            status.textContent = copied
+              ? 'Embed code copied to your clipboard.'
+              : 'Embed code selected. Press Ctrl+C (Cmd+C on Mac) to copy.';
+          }
+        });
+      }
+
+      // Initial paint
+      render();
+
+    })();
+  </script>
+
+</section>
+
+</body>
+</html>
