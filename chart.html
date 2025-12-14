@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NBA Rookie Value Index — Cost per Minute</title>
+</head>
+
+<body style="margin:0;">
+
+<section class="an-rookie-embed" role="region" aria-labelledby="an-rookie-title"
+  style="max-width:860px;width:100%;margin:16px auto;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         color:#0F172A;border:1px solid #E2E8F0;border-radius:16px;
+         box-shadow:0 1px 3px rgba(15,23,42,.10),0 14px 40px rgba(2,132,199,.16);">
+
+  <style>
+    /* ===== Scoped styles (NBA theme, light) ========================== */
+    section.an-rookie-embed,
+    section.an-rookie-embed *{ box-sizing:border-box; font-family:inherit; color:inherit; }
+
+    .an-rookie-embed{
+      --ink:#0F172A;
+      --muted:#64748B;
+      --muted2:#94A3B8;
+      --border:#E2E8F0;
+      --blue:#2563EB;
+      --sky:#0EA5E9;
+      --orange:#F97316;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 15% -25%, rgba(37,99,235,.10), transparent 60%),
+        radial-gradient(circle at 85% 120%, rgba(14,165,233,.12), transparent 65%),
+        radial-gradient(circle at -10% 115%, rgba(249,115,22,.10), transparent 65%),
+        #F8FAFC;
+    }
+
+    .an-rookie-embed::before{
+      content:"";
+      position:absolute; inset:-1px; border-radius:18px; padding:1px;
+      background:linear-gradient(135deg, rgba(37,99,235,.55), rgba(14,165,233,.35), rgba(249,115,22,.35));
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      opacity:.55; pointer-events:none;
+    }
+
+    .an-rookie-embed .head{
+      padding:14px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(37,99,235,.10), rgba(14,165,233,.06) 55%, rgba(249,115,22,.06));
+    }
+    .an-rookie-embed .title{
+      margin:0 0 4px;
+      font-size:clamp(16px,2.2vw,20px);
+      line-height:1.2;
+      font-weight:850;
+      letter-spacing:.01em;
+      color:var(--ink);
+    }
+    .an-rookie-embed .sub{ margin:0; color:var(--muted); font-size:12px; }
+    .an-rookie-embed .meta{ margin:6px 0 0; color:var(--muted2); font-size:11px; }
+
+    /* Toggle buttons */
+    .an-rookie-embed .controls{
+      display:flex; gap:8px; align-items:center;
+      padding:10px 12px 0; flex-wrap:wrap;
+    }
+    .an-rookie-embed .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .an-rookie-embed .btn .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:2px solid rgba(100,116,139,.35);
+      background:#fff;
+      box-shadow:inset 0 0 0 2px #fff;
+    }
+    .an-rookie-embed .btn[aria-pressed="true"]{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 2px rgba(37,99,235,.12);
+      background:linear-gradient(180deg, rgba(37,99,235,.10), #FFFFFF);
+    }
+    .an-rookie-embed .btn[aria-pressed="true"] .dot{
+      border-color:rgba(37,99,235,.35);
+      background:linear-gradient(180deg, var(--orange), var(--blue));
+    }
+    .an-rookie-embed .btn:focus-visible{
+      outline:2px solid rgba(14,165,233,.55);
+      outline-offset:2px;
+    }
+
+    /* Table wrapper */
+    .an-rookie-embed .table{
+      padding:10px 12px 12px;
+      max-height:min(72vh,640px);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-gutter:stable;
+    }
+    .an-rookie-embed .table::-webkit-scrollbar{ width:8px; height:8px }
+    .an-rookie-embed .table::-webkit-scrollbar-track{ background:#EEF2FF; border-radius:999px }
+    .an-rookie-embed .table::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg, rgba(37,99,235,.65), rgba(14,165,233,.55));
+      border-radius:999px;
+      border:2px solid #EEF2FF;
+    }
+
+    /* Grid rows */
+    .an-rookie-embed .row{
+      display:grid;
+      grid-template-columns: 42px minmax(0, 1.35fr) minmax(0, 0.9fr);
+      gap:10px;
+      align-items:center;
+      margin:6px 0;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #FBFDFF);
+      box-shadow:0 1px 0 rgba(15,23,42,.02);
+    }
+    .an-rookie-embed .row--head{
+      position:sticky; top:0; z-index:2;
+      margin:0 0 8px;
+      border-radius:12px;
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      box-shadow:0 10px 16px rgba(15,23,42,.06);
+    }
+    .an-rookie-embed .cell-head{
+      font-size:11px; text-transform:uppercase; letter-spacing:.10em;
+      color:var(--muted); font-weight:700;
+    }
+    .an-rookie-embed .cell-rank{
+      text-align:center;
+      font-variant-numeric:tabular-nums;
+      font-weight:800;
+      color:var(--ink);
+    }
+
+    /* Hover effect */
+    .an-rookie-embed .row--data{
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .an-rookie-embed .row--data:hover,
+    .an-rookie-embed .row--data:focus-within{
+      transform:translateY(-1px);
+      border-color:rgba(37,99,235,.45);
+      box-shadow:0 0 0 2px rgba(37,99,235,.10), 0 14px 28px rgba(2,132,199,.14);
+      outline:0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(37,99,235,.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,.06), transparent 55%),
+        #FFFFFF;
+    }
+
+    /* Player cell with headshot + link */
+    .an-rookie-embed .player{ display:flex; align-items:center; gap:12px; min-width:0; }
+    .an-rookie-embed .avatar{
+      flex:0 0 auto;
+      width:40px; height:40px; border-radius:999px;
+      background:linear-gradient(180deg, #FFFFFF, #F1F5F9);
+      border:1px solid rgba(148,163,184,.55);
+      box-shadow:0 6px 16px rgba(15,23,42,.08);
+      overflow:hidden;
+      padding:4px; /* more space so heads don't feel cropped */
+    }
+    .an-rookie-embed .avatar img{
+      width:100%; height:100%; border-radius:999px; display:block;
+      object-fit:cover; object-position:center 16%;
+      background:#fff;
+    }
+
+    .an-rookie-embed a.player-link{
+      text-decoration:none;
+      color:inherit;
+      display:block;
+      min-width:0;
+    }
+    .an-rookie-embed a.player-link:hover .pname{ text-decoration:underline; text-decoration-thickness:2px; }
+    .an-rookie-embed a.player-link:focus-visible{
+      outline:2px solid rgba(14,165,233,.55);
+      outline-offset:3px;
+      border-radius:10px;
+    }
+
+    .an-rookie-embed .pname{
+      min-width:0;
+      font-weight:850;
+      font-size:13px;
+      color:var(--ink);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .an-rookie-embed .pmeta{
+      display:block;
+      margin-top:2px;
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* Metric cell */
+    .an-rookie-embed .metric{ text-align:right; min-width:0; }
+    .an-rookie-embed .metric-big{
+      font-variant-numeric:tabular-nums;
+      font-weight:900;
+      font-size:14px;
+      color:var(--ink);
+      margin-bottom:4px;
+      white-space:nowrap;
+    }
+    .an-rookie-embed .pill-wrap{ display:flex; align-items:center; gap:8px; justify-content:flex-end; }
+    .an-rookie-embed .bar{
+      position:relative;
+      width:180px; max-width:100%;
+      height:7px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(148,163,184,.25);
+      border:1px solid rgba(148,163,184,.25);
+    }
+    .an-rookie-embed .bar > span{
+      position:absolute; inset:0; transform-origin:left center;
+      background:linear-gradient(90deg, rgba(249,115,22,.85), rgba(37,99,235,.85));
+    }
+    .an-rookie-embed .label{ font-size:10px; color:var(--muted); white-space:nowrap; }
+
+    /* Footer */
+    .an-rookie-embed .foot{
+      padding:10px 16px 12px;
+      border-top:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px 16px;
+      justify-content:space-between;
+    }
+    .an-rookie-embed .foot strong{ color:var(--ink); }
+
+    .an-rookie-embed .brand{
+      display:flex; align-items:center; gap:10px;
+      padding:7px 12px; border-radius:999px;
+      background:#FFFFFF;
+      border:1px solid var(--border);
+      box-shadow:0 6px 18px rgba(15,23,42,.06);
+    }
+    .an-rookie-embed .brand img{ width:74px;height:auto;display:block;border-radius:6px; }
+    .an-rookie-embed .brand .bt{ display:flex; flex-direction:column; gap:2px; line-height:1.1; }
+    .an-rookie-embed .brand .bt .t{ font-weight:800; color:var(--ink); font-size:11px; }
+    .an-rookie-embed .brand .bt .s{ color:var(--muted); font-size:10px; }
+
+    .an-rookie-embed .embed-tools{
+      display:flex; flex-direction:column; gap:6px;
+      align-items:flex-end; min-width:220px; flex:1 1 240px;
+    }
+    .an-rookie-embed .embed-btn{
+      appearance:none;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.75);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      padding:7px 10px;
+      font-size:11px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .an-rookie-embed .embed-btn:hover{
+      border-color:rgba(37,99,235,.50);
+      box-shadow:0 0 0 2px rgba(37,99,235,.10);
+    }
+    .an-rookie-embed .embed-wrap{ width:100%; max-width:360px; }
+    .an-rookie-embed .embed-label{ font-size:10px; margin-bottom:2px; color:var(--muted); text-align:right; }
+    .an-rookie-embed .embed-code{
+      width:100%;
+      min-height:72px;
+      max-height:110px;
+      padding:7px 9px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#FFFFFF;
+      color:var(--ink);
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:11px;
+      resize:vertical;
+    }
+    .an-rookie-embed .embed-status{ font-size:10px; color:var(--muted); margin-top:2px; text-align:right; }
+
+    @media (max-width:640px){
+      .an-rookie-embed .foot{ flex-direction:column; align-items:flex-start; }
+      .an-rookie-embed .embed-tools{ align-items:flex-start; width:100%; }
+      .an-rookie-embed .embed-wrap{ max-width:none; }
+      .an-rookie-embed .embed-label,.an-rookie-embed .embed-status{ text-align:left; }
+      .an-rookie-embed .bar{ width:150px; }
+    }
+    @media (max-width:480px){
+      .an-rookie-embed .row{ grid-template-columns:36px minmax(0,1.25fr) minmax(0,.95fr); padding:9px 10px; }
+      .an-rookie-embed .avatar{ width:38px; height:38px; padding:4px; }
+      .an-rookie-embed .metric-big{ font-size:13px; }
+    }
+  </style>
+
+  <header class="head">
+    <h2 id="an-rookie-title" class="title">NBA Rookie Value Index: Who Gives You the Most (and Least) Minutes for the Money</h2>
+    <p class="sub">
+      Toggle between the <strong>Most expensive</strong> rookies (highest cost per minute) and the <strong>Best value</strong> rookies (lowest cost per minute).
+    </p>
+    <p class="meta">
+      <strong>Cost per minute</strong> is estimated from <strong>Salary 2025 ÷ Minutes Played</strong>. Lower = better value.
+    </p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Toggle view">
+    <button type="button" class="btn btn-js" data-view="expensive" aria-pressed="true">
+      <span class="dot" aria-hidden="true"></span>
+      Most expensive (cost / minute)
+    </button>
+    <button type="button" class="btn btn-js" data-view="value" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Best value (cost / minute)
+    </button>
+  </div>
+
+  <div class="table" role="table" aria-label="NBA Rookie Value Index (Cost per minute)">
+
+    <!-- ===== EXPENSIVE VIEW (ONLY 5 ROWS) ===== -->
+    <div class="view view-expensive-js">
+
+      <div class="row row--head" role="row">
+        <div class="cell-head" role="columnheader">Rank</div>
+        <div class="cell-head" role="columnheader">Player</div>
+        <div class="cell-head" role="columnheader" style="text-align:right;">Cost per minute</div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">1</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/sheppre01.jpg" alt="Reed Sheppard headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/s/sheppre01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Reed Sheppard</div>
+            <span class="pmeta">Houston Rockets • G • 52 GP • 654 MIN • Salary $10,603,560</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$16,213 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(1.00);"></span></div>
+            <span class="label">Highest cost</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">2</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/dilliro01.jpg" alt="Rob Dillingham headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/d/dilliro01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Rob Dillingham</div>
+            <span class="pmeta">Minnesota Timberwolves • PG • 49 GP • 516 MIN • Salary $6,576,120</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$12,744 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.79);"></span></div>
+            <span class="label">Very high</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">3</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/risacza01.jpg" alt="Zaccharie Risacher headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/r/risacza01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Zaccharie Risacher</div>
+            <span class="pmeta">Atlanta Hawks • SF • 75 GP • 1,843 MIN • Salary $13,197,720</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$7,162 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.44);"></span></div>
+            <span class="label">High</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">4</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/hollaro01.jpg" alt="Ron Holland headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/h/hollaro01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Ron Holland</div>
+            <span class="pmeta">Detroit Pistons • SF • 81 GP • 1,266 MIN • Salary $8,657,280</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$6,840 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.42);"></span></div>
+            <span class="label">High</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">5</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/sarral01.jpg" alt="Alex Sarr headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/s/sarral01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Alex Sarr</div>
+            <span class="pmeta">Washington Wizards • C/PF • 67 GP • 1,814 MIN • Salary $11,808,240</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$6,511 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.40);"></span></div>
+            <span class="label">High</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== VALUE VIEW (ONLY 5 ROWS) ===== -->
+    <div class="view view-value-js" hidden>
+
+      <div class="row row--head" role="row">
+        <div class="cell-head" role="columnheader">Rank</div>
+        <div class="cell-head" role="columnheader">Player</div>
+        <div class="cell-head" role="columnheader" style="text-align:right;">Cost per minute</div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">1</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/reevean01.jpg" alt="Antonio Reeves headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/r/reevean01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Antonio Reeves</div>
+            <span class="pmeta">Charlotte Hornets • SG • 44 GP • 660 MIN • Salary $85,300</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$129 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.23);"></span></div>
+            <span class="label">Elite value</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">2</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/timmedr01.jpg" alt="Drew Timme headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/t/timmedr01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Drew Timme</div>
+            <span class="pmeta">Los Angeles Lakers • PF • 9 GP • 254 MIN • Salary $85,300</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$336 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.60);"></span></div>
+            <span class="label">Strong value</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">3</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/carlsbr01.jpg" alt="Branden Carlson headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/c/carlsbr01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Branden Carlson</div>
+            <span class="pmeta">Oklahoma City Thunder • C • 32 GP • 246 MIN • Salary $85,300</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$347 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.62);"></span></div>
+            <span class="label">Strong value</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">4</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/freemen01.jpg" alt="Enrique Freeman headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/f/freemen01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Enrique Freeman</div>
+            <span class="pmeta">Minnesota Timberwolves • PF • 22 GP • 181 MIN • Salary $85,300</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$471 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(0.84);"></span></div>
+            <span class="label">Good value</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row row--data" role="row" tabindex="0">
+        <div class="cell-rank" role="cell">5</div>
+        <div role="cell" class="player">
+          <span class="avatar" aria-hidden="true">
+            <img src="https://www.basketball-reference.com/req/202106291/images/headshots/etienty01.jpg" alt="Tyson Etienne headshot" loading="lazy">
+          </span>
+          <a class="player-link" href="https://www.basketball-reference.com/players/e/etienty01.html" target="_blank" rel="noopener noreferrer">
+            <div class="pname">Tyson Etienne</div>
+            <span class="pmeta">Brooklyn Nets • PG • 7 GP • 151 MIN • Salary $85,300</span>
+          </a>
+        </div>
+        <div role="cell" class="metric">
+          <div class="metric-big">$566 / min</div>
+          <div class="pill-wrap">
+            <div class="bar" aria-hidden="true"><span style="transform:scaleX(1.00);"></span></div>
+            <span class="label">Good value</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="foot">
+    <div>
+      <strong>Most expensive</strong> = highest estimated <strong>$ per minute</strong>. &nbsp;
+      <strong>Best value</strong> = lowest estimated <strong>$ per minute</strong>.
+    </div>
+
+    <div class="brand" aria-label="NBA Rookie Value Index by The Action Network">
+      <img src="https://i.postimg.cc/v8v27ZVc/download.png" alt="The Action Network logo">
+      <div class="bt">
+        <span class="t">NBA Rookie Value Index</span>
+        <span class="s">Data &amp; analysis by The Action Network</span>
+      </div>
+    </div>
+
+    <div class="embed-tools">
+      <button type="button" class="embed-btn embed-btn-js">
+        <span aria-hidden="true">⧉</span>
+        <span>Copy embed code</span>
+      </button>
+      <div class="embed-wrap embed-wrap-js" hidden>
+        <label class="embed-label" for="rookie-embed-code">Copy and paste this snippet to embed the chart:</label>
+        <textarea id="rookie-embed-code" class="embed-code embed-code-js" readonly>
+<!-- NBA Rookie Value Index embed -->
+<iframe src="https://www.actionnetwork.com/tools/nba-rookie-value-index-embed"
+title="NBA Rookie Value Index — Cost per Minute" loading="lazy"
+style="border:0;width:100%;max-width:860px;height:560px;border-radius:12px;overflow:hidden;"></iframe>
+        </textarea>
+        <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var root = document.querySelector('.an-rookie-embed');
+      if(!root) return;
+
+      var btns = root.querySelectorAll('.btn-js');
+      var expensiveView = root.querySelector('.view-expensive-js');
+      var valueView = root.querySelector('.view-value-js');
+
+      function setView(view){
+        btns.forEach(function(b){
+          b.setAttribute('aria-pressed', (b.getAttribute('data-view') === view) ? 'true' : 'false');
+        });
+        if(expensiveView) expensiveView.hidden = (view !== 'expensive');
+        if(valueView) valueView.hidden = (view !== 'value');
+      }
+
+      // Default: MOST EXPENSIVE (so it doesn't show both lists)
+      setView('expensive');
+
+      btns.forEach(function(b){
+        b.addEventListener('click', function(){
+          setView(b.getAttribute('data-view'));
+        });
+      });
+
+      // Copy embed code tool
+      var copyBtn = root.querySelector('.embed-btn-js');
+      var wrap = root.querySelector('.embed-wrap-js');
+      var ta = root.querySelector('.embed-code-js');
+      var status = root.querySelector('.embed-status-js');
+
+      if(copyBtn && wrap && ta){
+        copyBtn.addEventListener('click', function(){
+          wrap.hidden = false;
+          ta.focus();
+          ta.select();
+
+          var copied = false;
+          try { copied = document.execCommand('copy'); } catch(e) { copied = false; }
+
+          if(status){
+            status.textContent = copied
+              ? 'Embed code copied to your clipboard.'
+              : 'Embed code selected. Press Ctrl+C (Cmd+C on Mac) to copy.';
+          }
+        });
+      }
+    })();
+  </script>
+
+</section>
+
+</body>
+</html>
