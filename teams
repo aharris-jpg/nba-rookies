@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NBA Rookie Team Value Index — Full League</title>
+</head>
+
+<body style="margin:0;background:#ffffff;">
+
+<section class="an-rookie-embed" role="region" aria-labelledby="an-team-title"
+  style="max-width:960px;width:100%;margin:16px auto;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+         color:#0F172A;border:1px solid #E2E8F0;border-radius:16px;
+         box-shadow:0 1px 3px rgba(15,23,42,.10),0 14px 40px rgba(2,132,199,.16);">
+
+  <style>
+    section.an-rookie-embed,
+    section.an-rookie-embed *{ box-sizing:border-box; font-family:inherit; color:inherit; }
+
+    .an-rookie-embed{
+      --ink:#0F172A;
+      --muted:#64748B;
+      --muted2:#94A3B8;
+      --border:#E2E8F0;
+      --blue:#2563EB;
+      --sky:#0EA5E9;
+      --orange:#F97316;
+      --good:#16A34A;
+      --mid:#F59E0B;
+      --bad:#EF4444;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 15% -25%, rgba(37,99,235,.10), transparent 60%),
+        radial-gradient(circle at 85% 120%, rgba(14,165,233,.12), transparent 65%),
+        radial-gradient(circle at -10% 115%, rgba(249,115,22,.10), transparent 65%),
+        #F8FAFC;
+    }
+
+    .an-rookie-embed::before{
+      content:"";
+      position:absolute; inset:-1px; border-radius:18px; padding:1px;
+      background:linear-gradient(135deg, rgba(37,99,235,.55), rgba(14,165,233,.35), rgba(249,115,22,.35));
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+      opacity:.55; pointer-events:none;
+    }
+
+    .an-rookie-embed .head{
+      padding:14px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(135deg, rgba(37,99,235,.10), rgba(14,165,233,.06) 55%, rgba(249,115,22,.06));
+    }
+    .an-rookie-embed .title{
+      margin:0 0 4px;
+      font-size:clamp(16px,2.2vw,20px);
+      line-height:1.2;
+      font-weight:900;
+      letter-spacing:.01em;
+      color:var(--ink);
+    }
+    .an-rookie-embed .sub{ margin:0; color:var(--muted); font-size:12px; }
+    .an-rookie-embed .meta{ margin:6px 0 0; color:var(--muted2); font-size:11px; }
+
+    .an-rookie-embed .controls{
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px 0; flex-wrap:wrap;
+    }
+    .an-rookie-embed .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .an-rookie-embed .btn .dot{
+      width:10px;height:10px;border-radius:999px;
+      border:2px solid rgba(100,116,139,.35);
+      background:#fff;
+      box-shadow:inset 0 0 0 2px #fff;
+    }
+    .an-rookie-embed .btn[aria-pressed="true"]{
+      border-color:rgba(37,99,235,.55);
+      box-shadow:0 0 0 2px rgba(37,99,235,.12);
+      background:linear-gradient(180deg, rgba(37,99,235,.10), #FFFFFF);
+    }
+    .an-rookie-embed .btn[aria-pressed="true"] .dot{
+      border-color:rgba(37,99,235,.35);
+      background:linear-gradient(180deg, var(--orange), var(--blue));
+    }
+    .an-rookie-embed .btn:focus-visible{
+      outline:2px solid rgba(14,165,233,.55);
+      outline-offset:2px;
+    }
+
+    .an-rookie-embed .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px; border-radius:999px;
+      font-size:11px;
+      border:1px solid rgba(148,163,184,.55);
+      background:linear-gradient(180deg, #fff, #F8FAFC);
+      color:var(--muted);
+      margin-left:2px;
+    }
+    .an-rookie-embed .pill b{ font-weight:900; color:var(--ink); }
+
+    .an-rookie-embed .sort{
+      display:flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+    }
+    .an-rookie-embed .sort label{ font-size:12px; color:var(--muted); }
+    .an-rookie-embed .sort select{
+      border:0; outline:0;
+      font-size:12px;
+      background:transparent;
+      color:var(--ink);
+      cursor:pointer;
+    }
+
+    .an-rookie-embed .search{
+      margin-left:auto;
+      display:flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      min-width:min(360px,100%);
+      flex:1 1 260px;
+    }
+    .an-rookie-embed .search input{
+      border:0; outline:0; width:100%;
+      font-size:12px;
+      background:transparent;
+      color:var(--ink);
+    }
+
+    .an-rookie-embed .table{
+      padding:10px 12px 12px;
+      max-height:min(74vh,700px);
+      overflow:auto;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-gutter:stable;
+    }
+    .an-rookie-embed .table::-webkit-scrollbar{ width:8px; height:8px }
+    .an-rookie-embed .table::-webkit-scrollbar-track{ background:#EEF2FF; border-radius:999px }
+    .an-rookie-embed .table::-webkit-scrollbar-thumb{
+      background:linear-gradient(180deg, rgba(37,99,235,.65), rgba(14,165,233,.55));
+      border-radius:999px;
+      border:2px solid #EEF2FF;
+    }
+
+    /* SIMPLER ROW LAYOUT */
+    .an-rookie-embed .row{
+      display:grid;
+      grid-template-columns: 44px minmax(0, 1.8fr) minmax(0, 1.1fr);
+      gap:10px;
+      align-items:center;
+      margin:6px 0;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #FBFDFF);
+      box-shadow:0 1px 0 rgba(15,23,42,.02);
+    }
+    .an-rookie-embed .row--head{
+      position:sticky; top:0; z-index:2;
+      margin:0 0 8px;
+      border-radius:12px;
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      box-shadow:0 10px 16px rgba(15,23,42,.06);
+    }
+    .an-rookie-embed .cell-head{
+      font-size:11px; text-transform:uppercase; letter-spacing:.10em;
+      color:var(--muted); font-weight:800;
+    }
+    .an-rookie-embed .cell-rank{
+      text-align:center;
+      font-variant-numeric:tabular-nums;
+      font-weight:900;
+      color:var(--ink);
+      line-height:1;
+    }
+
+    .an-rookie-embed .row--data{
+      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+    }
+    .an-rookie-embed .row--data:hover,
+    .an-rookie-embed .row--data:focus-within{
+      transform:translateY(-1px);
+      border-color:rgba(37,99,235,.45);
+      box-shadow:0 0 0 2px rgba(37,99,235,.10), 0 14px 28px rgba(2,132,199,.14);
+      outline:0;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(37,99,235,.08), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(249,115,22,.06), transparent 55%),
+        #FFFFFF;
+    }
+
+    .an-rookie-embed .team{ display:flex; align-items:center; gap:12px; min-width:0; }
+    .an-rookie-embed .logo{
+      flex:0 0 auto;
+      width:40px; height:40px; border-radius:12px;
+      background:linear-gradient(180deg, #FFFFFF, #F1F5F9);
+      border:1px solid rgba(148,163,184,.55);
+      box-shadow:0 6px 16px rgba(15,23,42,.08);
+      overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding:6px;
+    }
+    .an-rookie-embed .logo img{
+      width:100%; height:100%;
+      object-fit:contain;
+      display:block;
+    }
+    .an-rookie-embed .logo .fallback{
+      font-weight:900;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .an-rookie-embed .tname{
+      min-width:0;
+      font-weight:900;
+      font-size:13px;
+      color:var(--ink);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      margin:0;
+    }
+    .an-rookie-embed .tmeta{
+      display:block;
+      margin-top:2px;
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .an-rookie-embed .metric{ text-align:right; min-width:0; }
+    .an-rookie-embed .metric-big{
+      font-variant-numeric:tabular-nums;
+      font-weight:900;
+      font-size:14px;
+      color:var(--ink);
+      margin-bottom:4px;
+      white-space:nowrap;
+    }
+    .an-rookie-embed .pill-wrap{ display:flex; align-items:center; gap:8px; justify-content:flex-end; flex-wrap:wrap; }
+    .an-rookie-embed .bar{
+      position:relative;
+      width:220px; max-width:100%;
+      height:7px;
+      border-radius:999px;
+      overflow:hidden;
+      background:rgba(148,163,184,.25);
+      border:1px solid rgba(148,163,184,.25);
+    }
+    .an-rookie-embed .bar > span{
+      position:absolute; inset:0; transform-origin:left center;
+      background:linear-gradient(90deg, rgba(249,115,22,.85), rgba(37,99,235,.85));
+    }
+    .an-rookie-embed .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:2px 8px; border-radius:999px;
+      border:1px solid rgba(148,163,184,.55);
+      background:#fff;
+      font-size:11px; color:var(--muted);
+      white-space:nowrap;
+    }
+    .an-rookie-embed .tag .sw{ width:8px; height:8px; border-radius:999px; background:rgba(148,163,184,.7); }
+    .an-rookie-embed .tag.good .sw{ background:rgba(22,163,74,.85); }
+    .an-rookie-embed .tag.mid .sw{ background:rgba(245,158,11,.90); }
+    .an-rookie-embed .tag.bad .sw{ background:rgba(239,68,68,.90); }
+
+    .an-rookie-embed .empty{
+      padding:18px 14px;
+      border:1px dashed rgba(148,163,184,.7);
+      background:rgba(255,255,255,.7);
+      border-radius:14px;
+      color:var(--muted);
+      text-align:center;
+      margin:10px 0 0;
+      font-size:12px;
+    }
+
+    .an-rookie-embed .foot{
+      padding:10px 16px 12px;
+      border-top:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      font-size:11px;
+      color:var(--muted);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      gap:10px 16px;
+      justify-content:space-between;
+    }
+    .an-rookie-embed .foot strong{ color:var(--ink); }
+    .an-rookie-embed .sources{ margin:0; padding-left:16px; max-width:520px; }
+    .an-rookie-embed .sources li{ margin:4px 0; }
+
+    @media (max-width:760px){ .an-rookie-embed .bar{ width:160px; } }
+    @media (max-width:520px){
+      .an-rookie-embed .row{ grid-template-columns:38px minmax(0,1.25fr) minmax(0,1.05fr); padding:9px 10px; }
+      .an-rookie-embed .logo{ width:36px; height:36px; }
+      .an-rookie-embed .metric-big{ font-size:13px; }
+    }
+  </style>
+
+  <header class="head">
+    <h2 id="an-team-title" class="title">NBA Rookie Team Value Index — Full League</h2>
+    <p class="sub">
+      Team rankings based on <strong>combined rookie salary</strong> vs. <strong>combined rookie minutes</strong>.
+      Default view: <strong>Overpaying</strong>.
+    </p>
+    <p class="meta">
+      Rankings exclude players with missing/zero salary so “free minutes” don’t distort cost-per-minute.
+    </p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Category toggles, sort, and search">
+    <button type="button" class="btn cat-btn-js" data-cat="overpaying" aria-pressed="true">
+      <span class="dot" aria-hidden="true"></span>
+      Overpaying
+      <span class="pill" aria-hidden="true">🔴 <b class="count-overpaying-js">—</b></span>
+    </button>
+    <button type="button" class="btn cat-btn-js" data-cat="neutral" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Neutral
+      <span class="pill" aria-hidden="true">🟡 <b class="count-neutral-js">—</b></span>
+    </button>
+    <button type="button" class="btn cat-btn-js" data-cat="value" aria-pressed="false">
+      <span class="dot" aria-hidden="true"></span>
+      Creating Value
+      <span class="pill" aria-hidden="true">🟢 <b class="count-value-js">—</b></span>
+    </button>
+
+    <div class="sort" aria-label="Sort teams">
+      <label for="sortMetric">Sort:</label>
+      <select id="sortMetric" class="sort-js">
+        <option value="costPerMinute_desc" selected>Cost / minute (high → low)</option>
+        <option value="costPerMinute_asc">Cost / minute (low → high)</option>
+        <option value="rookieMinutes_desc">Total rookie minutes (high → low)</option>
+        <option value="rookieSalary_desc">Total rookie salary (high → low)</option>
+      </select>
+    </div>
+
+    <div class="search" role="search" aria-label="Search teams">
+      <span aria-hidden="true">🔎</span>
+      <input class="search-input-js" type="search" placeholder="Search team…" />
+    </div>
+  </div>
+
+  <div class="table" role="table" aria-label="NBA Rookie Team Value Index (Full League)">
+    <div class="row row--head" role="row">
+      <div class="cell-head" role="columnheader">Rank</div>
+      <div class="cell-head" role="columnheader">Team</div>
+      <div class="cell-head metric-head-js" role="columnheader" style="text-align:right;">Rookie cost / minute</div>
+    </div>
+
+    <div class="rows-js"></div>
+    <div class="empty empty-js" hidden>No matches. Try a different search.</div>
+  </div>
+
+  <footer class="foot">
+    <div class="summary-js"><strong>View:</strong> Overpaying • <strong>Teams shown:</strong> —</div>
+
+    <div style="max-width:520px;">
+      <strong>Sources</strong>
+      <ol class="sources">
+        <li><strong>Action Network dataset</strong> (rookie salaries + minutes played) — TSV pasted directly into this embed.</li>
+        <li><strong>Basketball-Reference</strong> player pages referenced in the dataset.</li>
+        <li><strong>NBA team logos</strong> loaded via nba.com CDN (display only).</li>
+      </ol>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var root = document.querySelector('.an-rookie-embed');
+      if(!root) return;
+
+      // =======================
+      // 1) Raw TSV dataset
+      // =======================
+      // Replace RAW_TSV with your full paste (tab-separated).
+           var RAW_TSV = `Rank\tPlayer url\tPlayer\tDebut\tDate\tPosition\tTeam\tAge\tYrs\tGames\tMinutes Played\tDraft_Round\tDraft_Pick\tSalary 2025\tSalary_Normalized inverted\tCap hit/Cash?\tMinutesPerMillion\tMinutesPerMillion Normalized\tGamesPerMillion\tGamesPerMillion Normalized\tFinal Score\tHeight\tWeight (lb)\tHeight (cm)\tShoots\tCollege\tHigh_School\tDraft_Team\tDraft_Year\tTikTok_Handle\tIG_Handle
+1\thttps://www.basketball-reference.com/players/r/reevean01.html\tAntonio Reeves\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, NOP vs. CHI\tShooting Guard\tCharlotte Hornets\t24\t1\t44\t660\t2\t47\t85,300\t100\tCash\t7,737\t100\t516\t100\t225\t6-5\t205\t196\tRight\tIllinois State\tShadow Mountain in Phoenix, Arizona , Simeon in Chicago, Illinois\tOrlando Magic\t2024\t\thttps://instagram.com/tonioreeves
+2\thttps://www.basketball-reference.com/players/c/carlsbr01.html\tBranden Carlson\thttps://www.basketball-reference.com/boxscores/202411250SAC.html\tNov 25, '24, OKC @ SAC\tCenter\tOklahoma City Thunder\t25\t1\t32\t246\t\t\t85,300\t100\tCash\t2,884\t37\t375\t37\t164\t7-0\t220\t213\tRight\tUtah\tBingham in South Jordan, Utah\t\t\t\thttps://instagram.com/branden_carlson35
+3\thttps://www.basketball-reference.com/players/a/alexatr01.html\tTrey Alexander\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, DEN vs. OKC\tShooting Guard\tNew Orleans Pelicans\t21\t1\t24\t117\t\t\t85,300\t100\tCash\t1,372\t17\t281\t18\t130\t6-5\t185\t196\tRight\tCreighton\tHeritage Hall School in Oklahoma City, Oklahoma\t\t\t\thttps://instagram.com/TheTreyAlexander
+4\thttps://www.basketball-reference.com/players/f/freemen01.html\tEnrique Freeman\thttps://www.basketball-reference.com/boxscores/202410230DET.html\tOct 23, '24, IND @ DET\tPower Forward\tMinnesota Timberwolves\t24\t1\t22\t181\t2\t50\t85,300\t100\tCash\t2,122\t27\t258\t27\t126\t6-9\t220\t206\tRight\tUniversity of Akron\t\tIndiana Pacers\t2024\t\thttps://instagram.com/enriquefreeman_
+5\thttps://www.basketball-reference.com/players/j/jonessp01.html\tSpencer Jones\thttps://www.basketball-reference.com/boxscores/202411020DEN.html\tNov 2, '24, DEN vs. UTA\tSmall Forward\tDenver Nuggets\t23\t1\t20\t125\t\t\t85,300\t100\tCash\t1,465\t19\t234\t19\t116\t6-7\t225\t201\tRight\tStanford\tBishop Miege in Roeland Park, Kansas\t\t\t\thttps://instagram.com/skjones24
+6\thttps://www.basketball-reference.com/players/c/crawfis01.html\tIsaiah Crawford\thttps://www.basketball-reference.com/boxscores/202412080SAC.html\tDec 8, '24, SAC vs. UTA\tSmall Forward\tHouston Rockets\t23\t1\t15\t46\t\t\t85,300\t100\tCash\t539\t7\t176\t7\t95\t6-6\t220\t198\tRight\tLouisiana Tech\tNorth Crowley in Fort Worth, Texas\t\t\t\thttps://instagram.com/zaay.crawf
+7\thttps://www.basketball-reference.com/players/t/travelu01.html\tLuke Travers\thttps://www.basketball-reference.com/boxscores/202411010CLE.html\tNov 1, '24, CLE vs. ORL\tShooting Guard\tCleveland Cavaliers\t23\t1\t12\t88\t2\t56\t85,300\t100\tCash\t1,032\t13\t141\t13\t86\t6-6\t207\t198\tRight\t\tWilletton Senior High School in Willetton, Australia\tCleveland Cavaliers\t2022\thttps://www.tiktok.com/@luketravers6\thttps://instagram.com/luketravers_
+8\thttps://www.basketball-reference.com/players/t/timmedr01.html\tDrew Timme\thttps://www.basketball-reference.com/boxscores/202503280BRK.html\tMar 28, '25, BRK vs. LAC\tPower Forward\tLos Angeles Lakers\t24\t1\t9\t254\t\t\t85,300\t100\tCash\t2,978\t38\t106\t38\t83\t6-9\t235\t206\tRight\tGonzaga\tJ.J. Pearce HS in Richardson, Texas\t\t\thttps://www.tiktok.com/@drewtimme2\thttps://instagram.com/drew_timme2
+9\thttps://www.basketball-reference.com/players/e/etienty01.html\tTyson Etienne\thttps://www.basketball-reference.com/boxscores/202503280BRK.html\tMar 28, '25, BRK vs. LAC\tPoint Guard\tBrooklyn Nets\t25\t1\t7\t151\t\t\t85,300\t100\tCash\t1,770\t23\t82\t23\t71\t6-0\t200\t183\tRight\tWichita State\tDwight-Englewood School in Englewood, New Jersey , Long Island Lutheran in Brookville, New York , Putnam Science Academy in Putnam, Connecticut\t\t\t\thttps://instagram.com/thetysonetienne
+10\thttps://www.basketball-reference.com/players/p/plowdda01.html\tDaeqwon Plowden\thttps://www.basketball-reference.com/boxscores/202501150CHI.html\tJan 15, '25, ATL @ CHI\tShooting Guard\tSacramento Kings\t26\t1\t6\t72\t\t\t75,000\t100\tCash\t960\t12\t80\t12\t68\t6-4\t216\t193\tRight\tBowling Green\tMastery Charter North in Philadelphia, Pennsylvania\t\t\t\thttps://instagram.com/_dae29
+18\thttps://www.basketball-reference.com/players/w/wellsja01.html\tJaylen Wells\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tShooting Guard and Small Forward\tMemphis Grizzlies\t21\t1\t79\t2043\t2\t39\t1,955,377\t86\tCap Hit\t1,045\t13\t40\t14\t50\t6-7\t206\t201\tRight\tSonoma State University\tFolsom in Folsom, California\tMemphis Grizzlies\t2024\thttps://www.tiktok.com/@jay.snooze\thttps://instagram.com/jaylenwellss
+19\thttps://www.basketball-reference.com/players/s/sheadja01.html\tJamal Shead\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tPoint Guard\tToronto Raptors\t22\t1\t75\t1467\t2\t45\t1,955,377\t86\tCap Hit\t750\t9\t38\t10\t49\t6-1\t200\t185\tRight\tHouston\tManor in Austin, Texas\tSacramento Kings\t2024\t\t
+20\thttps://www.basketball-reference.com/players/m/mogbojo01.html\tJonathan Mogbo\thttps://www.basketball-reference.com/boxscores/202410230TOR.html\tOct 23, '24, TOR vs. CLE\tPower Forward\tToronto Raptors\t23\t1\t63\t1286\t2\t31\t1,955,377\t86\tCap Hit\t658\t8\t32\t8\t46\t6-9\t225\t206\tRight\tMissouri State\tForest Hill in West Palm Beach, Florida\tToronto Raptors\t2024\t\thttps://instagram.com/jnathan.1
+21\thttps://www.basketball-reference.com/players/i/ighodos01.html\tOso Ighodaro\thttps://www.basketball-reference.com/boxscores/202410230LAC.html\tOct 23, '24, PHO @ LAC\tPower Forward\tPhoenix Suns\t22\t1\t61\t1045\t2\t40\t1,955,377\t86\tCap Hit\t534\t7\t31\t7\t46\t6-11\t235\t211\tRight\tMarquette\tDesert Vista in Phoenix, Arizona\tPortland Trail Blazers\t2024\t\thttps://instagram.com/oso_i
+25\thttps://www.basketball-reference.com/players/c/colliis01.html\tIsaiah Collier\thttps://www.basketball-reference.com/boxscores/202411070MIL.html\tNov 7, '24, UTA @ MIL\tPoint Guard\tUtah Jazz\t20\t1\t71\t1839\t1\t29\t2,638,200\t80\tCap Hit\t697\t9\t27\t9\t43\t6-4\t210\t193\tRight\tUSC\tWheeler in Marietta, Georgia\tUtah Jazz\t2024\thttps://instagram.com/isaiahcollier
+33\thttps://www.basketball-reference.com/players/f/filipky01.html\tKyle Filipowski\thttps://www.basketball-reference.com/boxscores/202410250UTA.html\tOct 25, '24, UTA vs. GSW\tCenter\tUtah Jazz\t21\t1\t72\t1522\t2\t32\t3,000,000\t78\tCap Hit\t507\t6\t24\t7\t40\t6-11\t250\t211\tRight\tDuke\tMinisink Valley in Slate Hill, New York , Fordham Preparatory School in Bronx, New York , Wilbraham & Monson Academy in Wilbraham, Massachusetts\tUtah Jazz\t2024\thttps://www.tiktok.com/@kyle.flip\thttps://instagram.com/kyleflip
+45\thttps://www.basketball-reference.com/players/d/dasiltr01.html\tTristan Da Silva\thttps://www.basketball-reference.com/boxscores/202410230MIA.html\tOct 23, '24, ORL @ MIA\tSmall Forward\tOrlando Magic\t23\t1\t74\t1629\t1\t18\t3,809,520\t72\tCap Hit\t428\t5\t19\t6\t36\t6-8\t217\t203\tRight\tColorado\t\tOrlando Magic\t2024\t\thttps://instagram.com/tristan.da.silva
+49\thttps://www.basketball-reference.com/players/k/knechda01.html\tDalton Knecht\thttps://www.basketball-reference.com/boxscores/202410220LAL.html\tOct 22, '24, LAL vs. MIN\tSmall Forward\tLos Angeles Lakers\t23\t1\t78\t1494\t1\t17\t4,010,160\t70\tCap Hit\t373\t5\t19\t5\t35\t6-6\t215\t198\tRight\tNortheastern Junior College\tPrairie View in Henderson, Colorado\tLos Angeles Lakers\t2024\thttps://www.tiktok.com/@dalton.knecht1\thttps://instagram.com/daltonknecht3
+55\thttps://www.basketball-reference.com/players/c/carrica01.html\tBub Carrington\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tPoint Guard\tWashington Wizards\t19\t1\t82\t2458\t1\t14\t4,677,600\t65\tCap Hit\t525\t7\t18\t7\t33\t6-4\t190\t193\tRight\tPitt\tSaint Frances Academy in Baltimore, Maryland\tPortland Trail Blazers\t2024\t\thttps://instagram.com/noigbub
+58\thttps://www.basketball-reference.com/players/b/buzelma01.html\tMatas Buzelis\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, CHI @ NOP\tSmall Forward and Power Forward\tChicago Bulls\t20\t1\t80\t1511\t1\t11\t5,455,560\t59\tCap Hit\t277\t3\t15\t4\t29\t6-8\t209\t203\tRight\t\tHinsdale Central in Hinsdale, Illinois , Brewster Academy in Wolfeboro, New Hampshire , Sunrise Christian Academy in Bel Aire, Kansas\tChicago Bulls\t2024\thttps://www.tiktok.com/@matasbuzelis\thttps://instagram.com/matasbuzelis
+61\thttps://www.basketball-reference.com/players/e/edeyza01.html\tZach Edey\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tCenter\tMemphis Grizzlies\t22\t1\t66\t1416\t1\t9\t6,045,000\t55\tCap Hit\t234\t3\t11\t3\t26\t7-3\t305\t221\tRight\tPurdue\tLeaside in Toronto, Canada, IMG Academy in Bradenton, Florida\tMemphis Grizzlies\t2024\t\thttps://instagram.com/zach_edey
+64\thttps://www.basketball-reference.com/players/s/salauti01.html\tTidjane Salaün\thttps://www.basketball-reference.com/boxscores/202410260CHO.html\tOct 26, '24, CHO vs. MIA\tPower Forward\tCharlotte Hornets\t19\t1\t60\t1244\t1\t6\t7,863,240\t41\tCap Hit\t158\t2\t8\t2\t19\t6-10\t207\t208\tRight\t\t\tCharlotte Hornets\t2024\thttps://www.tiktok.com/@tidjanesalaun31\thttps://instagram.com/tidjane.sln
+65\thttps://www.basketball-reference.com/players/h/hollaro01.html\tRon Holland\thttps://www.basketball-reference.com/boxscores/202410230DET.html\tOct 23, '24, DET vs. IND\tSmall Forward\tDetroit Pistons\t19\t1\t81\t1266\t1\t5\t8,657,280\t35\tCap Hit\t146\t2\t9\t2\t17\t6-8\t206\t203\tRight\t\tDuncanville in Duncanville, Texas\tDetroit Pistons\t2024\thttps://www.tiktok.com/@_ronhoops\thttps://instagram.com/_ronhoops
+66\thttps://www.basketball-reference.com/players/c/castlst01.html\tStephon Castle\thttps://www.basketball-reference.com/boxscores/202410240DAL.html\tOct 24, '24, SAS @ DAL\tPoint Guard and Shooting Guard\tSan Antonio Spurs\t20\t1\t81\t2162\t1\t4\t9,560,520\t28\tCap Hit\t226\t3\t8\t3\t15\t6-6\t215\t198\tRight\tUConn\tNewton in Covington, Georgia\tSan Antonio Spurs\t2024\thttps://www.tiktok.com/@stephoncastle\thttps://instagram.com/stephcastle
+67\thttps://www.basketball-reference.com/players/s/sheppre01.html\tReed Sheppard\thttps://www.basketball-reference.com/players/s/sheppre01.html\tReed Sheppard\t\t\tPoint Guard and Shooting Guard\tHouston Rockets\t20\t1\t52\t654\t1\t3\t10,603,560\t20\tCap Hit\t62\t1\t5\t1\t10\t6-2\t185\t188\tRight\tKentucky\tNorth Laurel in London, Kentucky\tHouston Rockets\t2024\t\thttps://instagram.com/reedsheppard3
+68\thttps://www.basketball-reference.com/players/s/sarral01.html\tAlex Sarr\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tCenter and Power Forward\tWashington Wizards\t19\t1\t67\t1814\t1\t2\t11,808,240\t11\tCap Hit\t154\t2\t6\t2\t7\t7-0\t205\t213\tRight\t\tOvertime Elite Academy in Atlanta, Georgia\tWashington Wizards\t2024\thttps://www.tiktok.com/@alexandresarr20\thttps://instagram.com/alexsarr
+69\thttps://www.basketball-reference.com/players/r/risacza01.html\tZaccharie Risacher\thttps://www.basketball-reference.com/boxscores/202410230ATL.html\tOct 23, '24, ATL vs. BRK\tSmall Forward\tAtlanta Hawks\t19\t1\t75\t1843\t1\t1\t13,197,720\t0\tCap Hit\t140\t2\t6\t2\t2\t6-8\t200\t203\tRight\t\t\tAtlanta Hawks\t2024\t\thttps://instagram.com/_zacch_10`;
+
+
+      // =======================
+      // Helpers
+      // =======================
+      function toNum(x){
+        if(x == null) return null;
+        var s = String(x).trim();
+        if(!s) return null;
+        s = s.replace(/[$,]/g,'');
+        var n = Number(s);
+        return Number.isFinite(n) ? n : null;
+      }
+      function safeStr(x){ return (x == null) ? '' : String(x).trim(); }
+      function fmtMoney(x){
+        if(!Number.isFinite(x)) return '—';
+        return '$' + Math.round(x).toLocaleString('en-US');
+      }
+      function fmtCPM(x){
+        if(!Number.isFinite(x)) return '—';
+        return '$' + Math.round(x).toLocaleString('en-US') + ' / min';
+      }
+      function fmtInt(x){
+        if(!Number.isFinite(x)) return '—';
+        return Math.round(x).toLocaleString('en-US');
+      }
+      function quantile(sortedAsc, q){
+        if(!sortedAsc.length) return null;
+        var pos = (sortedAsc.length - 1) * q;
+        var base = Math.floor(pos);
+        var rest = pos - base;
+        if(sortedAsc[base+1] == null) return sortedAsc[base];
+        return sortedAsc[base] + rest * (sortedAsc[base+1] - sortedAsc[base]);
+      }
+
+      // NBA team id mapping for logos (nba.com CDN)
+      var TEAM_ID = {
+        "Atlanta Hawks":"1610612737",
+        "Boston Celtics":"1610612738",
+        "Brooklyn Nets":"1610612751",
+        "Charlotte Hornets":"1610612766",
+        "Chicago Bulls":"1610612741",
+        "Cleveland Cavaliers":"1610612739",
+        "Dallas Mavericks":"1610612742",
+        "Denver Nuggets":"1610612743",
+        "Detroit Pistons":"1610612765",
+        "Golden State Warriors":"1610612744",
+        "Houston Rockets":"1610612745",
+        "Indiana Pacers":"1610612754",
+        "Los Angeles Clippers":"1610612746",
+        "Los Angeles Lakers":"1610612747",
+        "Memphis Grizzlies":"1610612763",
+        "Miami Heat":"1610612748",
+        "Milwaukee Bucks":"1610612749",
+        "Minnesota Timberwolves":"1610612750",
+        "New Orleans Pelicans":"1610612740",
+        "New York Knicks":"1610612752",
+        "Oklahoma City Thunder":"1610612760",
+        "Orlando Magic":"1610612753",
+        "Philadelphia 76ers":"1610612755",
+        "Phoenix Suns":"1610612756",
+        "Portland Trail Blazers":"1610612757",
+        "Sacramento Kings":"1610612758",
+        "San Antonio Spurs":"1610612759",
+        "Toronto Raptors":"1610612761",
+        "Utah Jazz":"1610612762",
+        "Washington Wizards":"1610612764"
+      };
+      function teamLogo(teamName){
+        var id = TEAM_ID[teamName];
+        if(!id) return '';
+        return "https://cdn.nba.com/logos/nba/" + id + "/primary/L/logo.svg";
+      }
+
+      // =======================
+      // Parse TSV -> player rows
+      // =======================
+      function parseTSV(raw){
+        var lines = raw.split(/\r?\n/).filter(function(l){ return l.trim().length > 0; });
+        if(lines.length < 2) return [];
+        var headers = lines[0].split('\t').map(function(h){ return h.trim(); });
+        var idx = {};
+        headers.forEach(function(h,i){ idx[h] = i; });
+
+        function get(row, key){
+          var i = idx[key];
+          return (i == null) ? '' : (row[i] == null ? '' : row[i]);
+        }
+
+        var out = [];
+        for(var li=1; li<lines.length; li++){
+          var row = lines[li].split('\t');
+          var team = safeStr(get(row,'Team'));
+          var salary = toNum(get(row,'Salary 2025'));
+          var minutes = toNum(get(row,'Minutes Played'));
+          var player = safeStr(get(row,'Player'));
+          if(!player || !team) continue;
+
+          // exclude missing/zero salary (prevents fake "free minutes")
+          if(!(salary > 0) || !(minutes > 0)) continue;
+
+          out.push({ team:team, player:player, salary:salary, minutes:minutes });
+        }
+        return out;
+      }
+
+      var players = parseTSV(RAW_TSV);
+
+      // =======================
+      // Aggregate -> teams
+      // =======================
+      function buildTeams(rows){
+        var map = {};
+        rows.forEach(function(r){
+          if(!map[r.team]){
+            map[r.team] = { team:r.team, rookieSalary:0, rookieMinutes:0, topRookies:[] };
+          }
+          var t = map[r.team];
+          t.rookieSalary += r.salary;
+          t.rookieMinutes += r.minutes;
+          t.topRookies.push({ player:r.player, minutes:r.minutes });
+        });
+
+        var list = Object.keys(map).map(function(k){
+          var t = map[k];
+          t.costPerMinute = (t.rookieMinutes > 0) ? (t.rookieSalary / t.rookieMinutes) : null;
+          t.topRookies.sort(function(a,b){ return (b.minutes||0) - (a.minutes||0); });
+          t.topRookies = t.topRookies.slice(0,2); // simpler snippet
+          t.logo = teamLogo(t.team);
+          return t;
+        });
+
+        var costs = list.map(function(t){ return t.costPerMinute; })
+                        .filter(function(x){ return Number.isFinite(x); })
+                        .sort(function(a,b){ return a-b; });
+
+        var q33 = quantile(costs, 0.33);
+        var q66 = quantile(costs, 0.66);
+
+        list.forEach(function(t){
+          var c = t.costPerMinute;
+          if(!Number.isFinite(c) || q33 == null || q66 == null){
+            t.category = "neutral";
+          } else if(c <= q33){
+            t.category = "value";
+          } else if(c >= q66){
+            t.category = "overpaying";
+          } else {
+            t.category = "neutral";
+          }
+        });
+
+        return list;
+      }
+
+      var teamsAll = buildTeams(players);
+
+      // =======================
+      // UI + Rendering
+      // =======================
+      var rowsEl = root.querySelector('.rows-js');
+      var emptyEl = root.querySelector('.empty-js');
+      var metricHead = root.querySelector('.metric-head-js');
+      var summaryEl = root.querySelector('.summary-js');
+      var searchInput = root.querySelector('.search-input-js');
+      var catBtns = root.querySelectorAll('.cat-btn-js');
+      var sortSel = root.querySelector('.sort-js');
+
+      var countOverEl = root.querySelector('.count-overpaying-js');
+      var countNeutEl = root.querySelector('.count-neutral-js');
+      var countValEl = root.querySelector('.count-value-js');
+
+      var state = { cat:'overpaying', search:'', sort:'costPerMinute_desc' };
+
+      function setCounts(){
+        var o=0,n=0,v=0;
+        teamsAll.forEach(function(t){
+          if(t.category === 'overpaying') o++;
+          else if(t.category === 'value') v++;
+          else n++;
+        });
+        countOverEl.textContent = String(o);
+        countNeutEl.textContent = String(n);
+        countValEl.textContent = String(v);
+      }
+
+      function getSortFn(sortKey){
+        switch(sortKey){
+          case 'costPerMinute_asc': return function(a,b){ return (a.costPerMinute||0) - (b.costPerMinute||0); };
+          case 'rookieMinutes_desc': return function(a,b){ return (b.rookieMinutes||0) - (a.rookieMinutes||0); };
+          case 'rookieSalary_desc': return function(a,b){ return (b.rookieSalary||0) - (a.rookieSalary||0); };
+          case 'costPerMinute_desc':
+          default: return function(a,b){ return (b.costPerMinute||0) - (a.costPerMinute||0); };
+        }
+      }
+
+      function tagClass(cat){
+        if(cat === 'value') return 'good';
+        if(cat === 'overpaying') return 'bad';
+        return 'mid';
+      }
+      function tagLabel(cat){
+        if(cat === 'value') return 'Creating value';
+        if(cat === 'overpaying') return 'Overpaying';
+        return 'Neutral';
+      }
+
+      function metricLabel(){
+        if(state.sort.indexOf('rookieMinutes') === 0) return 'Total rookie minutes';
+        if(state.sort.indexOf('rookieSalary') === 0) return 'Total rookie salary';
+        return 'Rookie cost / minute';
+      }
+      function metricValue(t){
+        if(state.sort.indexOf('rookieMinutes') === 0) return t.rookieMinutes;
+        if(state.sort.indexOf('rookieSalary') === 0) return t.rookieSalary;
+        return t.costPerMinute;
+      }
+      function metricFormat(t){
+        if(state.sort.indexOf('rookieMinutes') === 0) return fmtInt(t.rookieMinutes) + ' min';
+        if(state.sort.indexOf('rookieSalary') === 0) return fmtMoney(t.rookieSalary);
+        return fmtCPM(t.costPerMinute);
+      }
+
+      function snippet(t){
+        if(!t.topRookies || !t.topRookies.length) return '';
+        return t.topRookies.map(function(r){
+          return r.player + " (" + fmtInt(r.minutes) + " min)";
+        }).join(" • ");
+      }
+
+      function render(){
+        var q = (state.search || '').toLowerCase().trim();
+
+        var filtered = teamsAll.filter(function(t){
+          if(state.cat && t.category !== state.cat) return false;
+          if(q && t.team.toLowerCase().indexOf(q) === -1) return false;
+          return true;
+        });
+
+        filtered.sort(getSortFn(state.sort));
+        metricHead.textContent = metricLabel();
+
+        var vals = filtered.map(function(t){ return metricValue(t); })
+                           .filter(function(x){ return Number.isFinite(x) && x > 0; });
+        var max = 0;
+        for(var i=0;i<vals.length;i++) if(vals[i] > max) max = vals[i];
+        if(!Number.isFinite(max) || max <= 0) max = 1;
+
+        var html = '';
+        for(var i2=0;i2<filtered.length;i2++){
+          var t2 = filtered[i2];
+          var rank = i2 + 1;
+
+          var mv = metricValue(t2);
+          var frac = (Number.isFinite(mv) && mv > 0) ? (mv / max) : 0;
+          if(frac > 1) frac = 1;
+
+          var logo = t2.logo;
+          var fallback = (t2.team || '—').split(' ').map(function(w){ return w[0]||''; }).join('').slice(0,3).toUpperCase();
+          var snip = snippet(t2);
+
+          html += ''
+            + '<div class="row row--data" role="row" tabindex="0">'
+            +   '<div class="cell-rank" role="cell">' + rank + '</div>'
+            +   '<div class="team" role="cell">'
+            +     '<div class="logo" aria-hidden="true">'
+            +       (logo
+                      ? '<img src="' + logo + '" alt="" onerror="this.remove(); this.parentNode.innerHTML = \'<span class=&quot;fallback&quot;>' + fallback + '</span>\';">'
+                      : '<span class="fallback">' + fallback + '</span>')
+            +     '</div>'
+            +     '<div style="min-width:0;">'
+            +       '<p class="tname" title="' + t2.team + '">' + t2.team + '</p>'
+            +       '<span class="tmeta">Rookie minutes: <strong>' + fmtInt(t2.rookieMinutes) + '</strong> • Rookie salary: <strong>' + fmtMoney(t2.rookieSalary) + '</strong></span>'
+            +       (snip ? '<div class="tmeta" style="margin-top:4px;">' + snip + '</div>' : '')
+            +     '</div>'
+            +   '</div>'
+            +   '<div class="metric" role="cell">'
+            +     '<div class="metric-big">' + metricFormat(t2) + '</div>'
+            +     '<div class="pill-wrap">'
+            +       '<div class="bar" aria-hidden="true"><span style="transform:scaleX(' + frac.toFixed(4) + ');"></span></div>'
+            +       '<span class="tag ' + tagClass(t2.category) + '"><span class="sw" aria-hidden="true"></span>' + tagLabel(t2.category) + '</span>'
+            +     '</div>'
+            +   '</div>'
+            + '</div>';
+        }
+
+        rowsEl.innerHTML = html;
+        emptyEl.hidden = filtered.length !== 0;
+
+        summaryEl.innerHTML =
+          '<strong>View:</strong> ' + tagLabel(state.cat) +
+          ' • <strong>Teams shown:</strong> ' + filtered.length +
+          ' • <strong>Sort:</strong> ' + metricLabel();
+      }
+
+      function setCat(cat){
+        state.cat = cat;
+        catBtns.forEach(function(b){
+          b.setAttribute('aria-pressed', b.getAttribute('data-cat') === cat ? 'true' : 'false');
+        });
+        render();
+      }
+
+      catBtns.forEach(function(b){
+        b.addEventListener('click', function(){ setCat(b.getAttribute('data-cat')); });
+      });
+      searchInput.addEventListener('input', function(){ state.search = searchInput.value || ''; render(); });
+      sortSel.addEventListener('change', function(){ state.sort = sortSel.value; render(); });
+
+      setCounts();
+      render();
+    })();
+  </script>
+
+</section>
+
+</body>
+</html>
