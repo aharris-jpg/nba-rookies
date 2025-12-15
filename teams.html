@@ -377,40 +377,41 @@
     <div class="empty empty-js" hidden>No matches. Try a different search.</div>
   </div>
 
-  <footer class="foot">
-    <div class="summary-js"><strong>View:</strong> Overpaying • <strong>Teams shown:</strong> —</div>
+ <footer class="foot">
+  <div class="summary-js"><strong>View:</strong> Overpaying • <strong>Teams shown:</strong> —</div>
 
-    <div style="max-width:520px;">
-      <strong>Sources</strong>
-      <ol class="sources">
-        <li><strong>Action Network dataset</strong> (rookie salaries + minutes played) — TSV pasted directly into this embed.</li>
-        <li><strong>Basketball-Reference</strong> player pages referenced in the dataset.</li>
-        <li><strong>NBA team logos</strong> loaded via nba.com CDN (display only).</li>
-      </ol>
-    </div>
-    <!-- Embed tools -->
-    <div class="embed-tools">
-      <button type="button" class="embed-btn embed-btn-js">
-        <span aria-hidden="true">⧉</span>
-        <span>Copy embed code</span>
-      </button>
+  <div style="max-width:520px;">
+    <strong>Sources</strong>
+    <ol class="sources">
+      <li><strong>Action Network dataset</strong> (rookie salaries + minutes played) — TSV pasted directly into this embed.</li>
+      <li><strong>Basketball-Reference</strong> player pages referenced in the dataset.</li>
+      <li><strong>NBA team logos</strong> loaded via nba.com CDN (display only).</li>
+    </ol>
+  </div>
+  <!-- Embed tools -->
+  <div class="embed-tools">
+    <button type="button" class="embed-btn embed-btn-js">
+      <span aria-hidden="true">⧉</span>
+      <span>Copy embed code</span>
+    </button>
 
-      <div class="embed-wrap embed-wrap-js" hidden>
-        <label class="embed-label" for="team-embed-code">
-          Copy and paste this snippet to embed the chart:
-        </label>
-        <textarea id="team-embed-code" class="embed-code embed-code-js" readonly>
+    <div class="embed-wrap embed-wrap-js" hidden>
+      <label class="embed-label" for="team-embed-code">
+        Copy and paste this snippet to embed the chart:
+      </label>
+      <textarea id="team-embed-code" class="embed-code embed-code-js" readonly>
 <!-- NBA Rookie Team Value Index embed -->
 <iframe src="https://aharris-jpg.github.io/nba-rookies/teams.html"
 title="NBA Rookie Team Value Index — Full League"
 loading="lazy"
 style="border:0;width:100%;max-width:960px;height:740px;border-radius:16px;overflow:hidden;"></iframe>
-        </textarea>
-        <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
-      </div>
+      </textarea>
+      <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
     </div>
+  </div>
 
-  </footer>
+</footer>
+
 
   <script>
     (function(){
