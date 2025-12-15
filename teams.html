@@ -756,6 +756,77 @@
       searchInput.addEventListener('input', function(){ state.search = searchInput.value || ''; render(); });
       sortSel.addEventListener('change', function(){ state.sort = sortSel.value; render(); });
 
+      <script>
+(function(){
+  var root = document.querySelector('.an-rookie-embed');
+  if(!root) return;
+
+  /* …all your existing JS… */
+
+  sortSel.addEventListener('change', function(){ state.sort = sortSel.value; render(); });
+
+  /* ✅ PASTE EMBED TOOLS JS HERE */
+  var embedBtn = root.querySelector('.embed-btn-js');
+  var embedWrap = root.querySelector('.embed-wrap-js');
+  var embedCode = root.querySelector('.embed-code-js');
+  var embedStatus = root.querySelector('.embed-status-js');
+
+  function setEmbedOpen(open){
+    if(!embedBtn || !embedWrap) return;
+    if(open){
+      embedWrap.removeAttribute('hidden');
+      embedBtn.setAttribute('aria-expanded','true');
+    }else{
+      embedWrap.setAttribute('hidden','');
+      embedBtn.setAttribute('aria-expanded','false');
+    }
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject){
+      try{
+        embedCode.focus();
+        embedCode.select();
+        var ok = document.execCommand('copy');
+        ok ? resolve() : reject(new Error('copy failed'));
+      }catch(e){
+        reject(e);
+      }
+    });
+  }
+
+  if(embedBtn && embedWrap && embedCode){
+    embedBtn.setAttribute('aria-expanded', embedWrap.hasAttribute('hidden') ? 'false' : 'true');
+
+    embedBtn.addEventListener('click', function(){
+      var isOpen = !embedWrap.hasAttribute('hidden');
+
+      if(isOpen){
+        setEmbedOpen(false);
+        if(embedStatus) embedStatus.textContent = '';
+        return;
+      }
+
+      setEmbedOpen(true);
+
+      var text = embedCode.value;
+      copyText(text).then(function(){
+        if(embedStatus) embedStatus.textContent = 'Copied!';
+      }).catch(function(){
+        if(embedStatus) embedStatus.textContent = 'Opened. Copy manually if needed.';
+      });
+    });
+  }
+
+  /* keep these EXACTLY where they already are */
+  setCounts();
+  render();
+})();
+</script>
+
       setCounts();
       render();
     })();
