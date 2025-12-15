@@ -8,7 +8,7 @@
 
 <body style="margin:0;background:#ffffff;">
 
-<section class="an-rookie-embed" role="region" aria-labelledby="an-team-title"
+<section class="an-rookie-embed" role="region" aria-label="NBA Rookie Team Value Index — Full League"
   style="max-width:960px;width:100%;margin:16px auto;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
          color:#0F172A;border:1px solid #E2E8F0;border-radius:16px;
          box-shadow:0 1px 3px rgba(15,23,42,.10),0 14px 40px rgba(2,132,199,.16);">
@@ -101,17 +101,6 @@
       outline-offset:2px;
     }
 
-    .an-rookie-embed .pill{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:2px 8px; border-radius:999px;
-      font-size:11px;
-      border:1px solid rgba(148,163,184,.55);
-      background:linear-gradient(180deg, #fff, #F8FAFC);
-      color:var(--muted);
-      margin-left:2px;
-    }
-    .an-rookie-embed .pill b{ font-weight:900; color:var(--ink); }
-
     .an-rookie-embed .sort{
       display:flex; align-items:center; gap:8px;
       padding:6px 10px;
@@ -154,15 +143,7 @@
       -webkit-overflow-scrolling:touch;
       scrollbar-gutter:stable;
     }
-    .an-rookie-embed .table::-webkit-scrollbar{ width:8px; height:8px }
-    .an-rookie-embed .table::-webkit-scrollbar-track{ background:#EEF2FF; border-radius:999px }
-    .an-rookie-embed .table::-webkit-scrollbar-thumb{
-      background:linear-gradient(180deg, rgba(37,99,235,.65), rgba(14,165,233,.55));
-      border-radius:999px;
-      border:2px solid #EEF2FF;
-    }
 
-    /* SIMPLER ROW LAYOUT */
     .an-rookie-embed .row{
       display:grid;
       grid-template-columns: 44px minmax(0, 1.8fr) minmax(0, 1.1fr);
@@ -314,6 +295,26 @@
     .an-rookie-embed .sources{ margin:0; padding-left:16px; max-width:520px; }
     .an-rookie-embed .sources li{ margin:4px 0; }
 
+    .embed-btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, #FFFFFF, #F8FAFC);
+      border-radius:999px;
+      padding:8px 10px;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 1px 0 rgba(15,23,42,.03);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .embed-wrap{ margin-top:8px; max-width:520px; }
+    .embed-label{ display:block; font-size:11px; color:var(--muted); margin-bottom:6px; }
+    .embed-code{ width:100%; min-height:90px; font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; padding:10px; border-radius:12px; border:1px solid var(--border); background:#fff; }
+    .embed-status{ margin-top:6px; font-size:11px; color:var(--muted); }
+
     @media (max-width:760px){ .an-rookie-embed .bar{ width:160px; } }
     @media (max-width:520px){
       .an-rookie-embed .row{ grid-template-columns:38px minmax(0,1.25fr) minmax(0,1.05fr); padding:9px 10px; }
@@ -323,40 +324,35 @@
   </style>
 
   <header class="head">
-    <h2 id="an-team-title" class="title">NBA Rookie Team Value Index — Full League</h2>
+    <h2 class="title">NBA Rookie Team Value Index — Full League</h2>
     <p class="sub">
       Team rankings based on <strong>combined rookie salary</strong> vs. <strong>combined rookie minutes</strong>.
-      Default view: <strong>Overpaying</strong>.
+      The <strong>Overpaying</strong> and <strong>Creating Value</strong> lists are locked to the editorial order you provided.
     </p>
     <p class="meta">
-      Rankings exclude players with missing/zero salary so “free minutes” don’t distort cost-per-minute.
+      Teams exclude players with missing/zero salary so “free minutes” don’t distort cost-per-minute.
     </p>
   </header>
 
   <div class="controls" role="group" aria-label="Category toggles, sort, and search">
     <button type="button" class="btn cat-btn-js" data-cat="overpaying" aria-pressed="true">
-      <span class="dot" aria-hidden="true"></span>
-      Overpaying
-      <span class="pill" aria-hidden="true">🔴 <b class="count-overpaying-js">—</b></span>
+      <span class="dot" aria-hidden="true"></span> Overpaying
     </button>
     <button type="button" class="btn cat-btn-js" data-cat="neutral" aria-pressed="false">
-      <span class="dot" aria-hidden="true"></span>
-      Neutral
-      <span class="pill" aria-hidden="true">🟡 <b class="count-neutral-js">—</b></span>
+      <span class="dot" aria-hidden="true"></span> Neutral
     </button>
     <button type="button" class="btn cat-btn-js" data-cat="value" aria-pressed="false">
-      <span class="dot" aria-hidden="true"></span>
-      Creating Value
-      <span class="pill" aria-hidden="true">🟢 <b class="count-value-js">—</b></span>
+      <span class="dot" aria-hidden="true"></span> Creating Value
     </button>
 
     <div class="sort" aria-label="Sort teams">
       <label for="sortMetric">Sort:</label>
       <select id="sortMetric" class="sort-js">
-        <option value="costPerMinute_desc" selected>Cost / minute (high → low)</option>
-        <option value="costPerMinute_asc">Cost / minute (low → high)</option>
-        <option value="rookieMinutes_desc">Total rookie minutes (high → low)</option>
-        <option value="rookieSalary_desc">Total rookie salary (high → low)</option>
+        <option value="cpm_desc" selected>Cost / minute (high → low)</option>
+        <option value="cpm_asc">Cost / minute (low → high)</option>
+        <option value="mins_desc">Total rookie minutes (high → low)</option>
+        <option value="sal_desc">Total rookie salary (high → low)</option>
+        <option value="alpha_asc">Team name (A → Z)</option>
       </select>
     </div>
 
@@ -377,38 +373,33 @@
     <div class="empty empty-js" hidden>No matches. Try a different search.</div>
   </div>
 
- <footer class="foot">
-  <div class="summary-js">
-    <strong>View:</strong> Overpaying • <strong>Teams shown:</strong> —
-  </div>
-
-  <div style="max-width:520px;">
-    <strong>Sources</strong>
-    <ol class="sources">
-      <li><strong>Action Network dataset</strong> (rookie salaries + minutes played) — TSV pasted directly into this embed.</li>
-      <li><strong>Basketball-Reference</strong> player pages referenced in the dataset.</li>
-      <li><strong>NBA team logos</strong> loaded via nba.com CDN (display only).</li>
-    </ol>
-  </div>
-
-  <!-- Copy embed code -->
-  <div class="embed-tools">
-    <button type="button" class="embed-btn embed-btn-js">
-      <span aria-hidden="true">⧉</span>
-      <span>Copy embed code</span>
-    </button>
-
-    <div class="embed-wrap embed-wrap-js" hidden>
-      <label class="embed-label" for="team-embed-code">
-        Copy and paste this snippet to embed the chart:
-      </label>
-      <textarea id="team-embed-code" class="embed-code embed-code-js" readonly><iframe src="https://aharris-jpg.github.io/nba-rookies/teams.html" title="NBA Rookie Team Value Index — Full League" loading="lazy" style="border:0;width:100%;max-width:960px;height:740px;border-radius:16px;overflow:hidden;"></iframe></textarea>
-      <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
+  <footer class="foot">
+    <div class="summary-js">
+      <strong>View:</strong> Overpaying • <strong>Teams shown:</strong> —
     </div>
-  </div>
-</footer>
 
+    <div style="max-width:520px;">
+      <strong>Sources</strong>
+      <ol class="sources">
+        <li><strong>Action Network dataset</strong> (rookie salaries + minutes played) — TSV pasted directly into this embed.</li>
+        <li><strong>Basketball-Reference</strong> player pages referenced in the dataset.</li>
+        <li><strong>NBA team logos</strong> loaded via nba.com CDN (display only).</li>
+      </ol>
+    </div>
 
+    <div class="embed-tools">
+      <button type="button" class="embed-btn embed-btn-js" aria-expanded="false">
+        <span aria-hidden="true">⧉</span>
+        <span>Copy embed code</span>
+      </button>
+
+      <div class="embed-wrap embed-wrap-js" hidden>
+        <label class="embed-label" for="team-embed-code">Copy and paste this snippet to embed the chart:</label>
+        <textarea id="team-embed-code" class="embed-code embed-code-js" readonly><iframe src="https://aharris-jpg.github.io/nba-rookies/teams.html" title="NBA Rookie Team Value Index — Full League" loading="lazy" style="border:0;width:100%;max-width:960px;height:740px;border-radius:16px;overflow:hidden;"></iframe></textarea>
+        <div class="embed-status embed-status-js" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </footer>
 
   <script>
     (function(){
@@ -418,8 +409,7 @@
       // =======================
       // 1) Raw TSV dataset
       // =======================
-      // Replace RAW_TSV with your full paste (tab-separated).
-           var RAW_TSV = `Rank\tPlayer url\tPlayer\tDebut\tDate\tPosition\tTeam\tAge\tYrs\tGames\tMinutes Played\tDraft_Round\tDraft_Pick\tSalary 2025\tSalary_Normalized inverted\tCap hit/Cash?\tMinutesPerMillion\tMinutesPerMillion Normalized\tGamesPerMillion\tGamesPerMillion Normalized\tFinal Score\tHeight\tWeight (lb)\tHeight (cm)\tShoots\tCollege\tHigh_School\tDraft_Team\tDraft_Year\tTikTok_Handle\tIG_Handle
+      var RAW_TSV = `Rank\tPlayer url\tPlayer\tDebut\tDate\tPosition\tTeam\tAge\tYrs\tGames\tMinutes Played\tDraft_Round\tDraft_Pick\tSalary 2025\tSalary_Normalized inverted\tCap hit/Cash?\tMinutesPerMillion\tMinutesPerMillion Normalized\tGamesPerMillion\tGamesPerMillion Normalized\tFinal Score\tHeight\tWeight (lb)\tHeight (cm)\tShoots\tCollege\tHigh_School\tDraft_Team\tDraft_Year\tTikTok_Handle\tIG_Handle
 1\thttps://www.basketball-reference.com/players/r/reevean01.html\tAntonio Reeves\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, NOP vs. CHI\tShooting Guard\tCharlotte Hornets\t24\t1\t44\t660\t2\t47\t85,300\t100\tCash\t7,737\t100\t516\t100\t225\t6-5\t205\t196\tRight\tIllinois State\tShadow Mountain in Phoenix, Arizona , Simeon in Chicago, Illinois\tOrlando Magic\t2024\t\thttps://instagram.com/tonioreeves
 2\thttps://www.basketball-reference.com/players/c/carlsbr01.html\tBranden Carlson\thttps://www.basketball-reference.com/boxscores/202411250SAC.html\tNov 25, '24, OKC @ SAC\tCenter\tOklahoma City Thunder\t25\t1\t32\t246\t\t\t85,300\t100\tCash\t2,884\t37\t375\t37\t164\t7-0\t220\t213\tRight\tUtah\tBingham in South Jordan, Utah\t\t\t\thttps://instagram.com/branden_carlson35
 3\thttps://www.basketball-reference.com/players/a/alexatr01.html\tTrey Alexander\thttps://www.basketball-reference.com/boxscores/202410240DEN.html\tOct 24, '24, DEN vs. OKC\tShooting Guard\tNew Orleans Pelicans\t21\t1\t24\t117\t\t\t85,300\t100\tCash\t1,372\t17\t281\t18\t130\t6-5\t185\t196\tRight\tCreighton\tHeritage Hall School in Oklahoma City, Oklahoma\t\t\t\thttps://instagram.com/TheTreyAlexander
@@ -440,7 +430,7 @@
 49\thttps://www.basketball-reference.com/players/k/knechda01.html\tDalton Knecht\thttps://www.basketball-reference.com/boxscores/202410220LAL.html\tOct 22, '24, LAL vs. MIN\tSmall Forward\tLos Angeles Lakers\t23\t1\t78\t1494\t1\t17\t4,010,160\t70\tCap Hit\t373\t5\t19\t5\t35\t6-6\t215\t198\tRight\tNortheastern Junior College\tPrairie View in Henderson, Colorado\tLos Angeles Lakers\t2024\thttps://www.tiktok.com/@dalton.knecht1\thttps://instagram.com/daltonknecht3
 55\thttps://www.basketball-reference.com/players/c/carrica01.html\tBub Carrington\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tPoint Guard\tWashington Wizards\t19\t1\t82\t2458\t1\t14\t4,677,600\t65\tCap Hit\t525\t7\t18\t7\t33\t6-4\t190\t193\tRight\tPitt\tSaint Frances Academy in Baltimore, Maryland\tPortland Trail Blazers\t2024\t\thttps://instagram.com/noigbub
 58\thttps://www.basketball-reference.com/players/b/buzelma01.html\tMatas Buzelis\thttps://www.basketball-reference.com/boxscores/202410230NOP.html\tOct 23, '24, CHI @ NOP\tSmall Forward and Power Forward\tChicago Bulls\t20\t1\t80\t1511\t1\t11\t5,455,560\t59\tCap Hit\t277\t3\t15\t4\t29\t6-8\t209\t203\tRight\t\tHinsdale Central in Hinsdale, Illinois , Brewster Academy in Wolfeboro, New Hampshire , Sunrise Christian Academy in Bel Aire, Kansas\tChicago Bulls\t2024\thttps://www.tiktok.com/@matasbuzelis\thttps://instagram.com/matasbuzelis
-61\thttps://www.basketball-reference.com/players/e/edeyza01.html\tZach Edey\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tCenter\tMemphis Grizzlies\t22\t1\t66\t1416\t1\t9\t6,045,000\t55\tCap Hit\t234\t3\t11\t3\t26\t7-3\t305\t221\tRight\tPurdue\tLeaside in Toronto, Canada, IMG Academy in Bradenton, Florida\tMemphis Grizzlies\t2024\t\thttps://instagram.com/zach_edey
+61\thttps://www.basketball-reference.com/players/e/edeyza01.html\tZach Edey\thttps://www.basketball-reference.com/boxscores/202410230UTA.html\tOct 23, '24, MEM @ UTA\tCenter\tMemphis Grizzlies\t22\t1\t66\t1416\t1\t9\t6,045,000\t55\tCap Hit\t234\t3\t11\t3\t26\t7-3\t305\t221\tRight\tPurdue\tLeaside in Toronto, Canada, IMG Academy in Bradenton, Florida\tMemphis Grizzlies\t2024\thttps://instagram.com/zach_edey
 64\thttps://www.basketball-reference.com/players/s/salauti01.html\tTidjane Salaün\thttps://www.basketball-reference.com/boxscores/202410260CHO.html\tOct 26, '24, CHO vs. MIA\tPower Forward\tCharlotte Hornets\t19\t1\t60\t1244\t1\t6\t7,863,240\t41\tCap Hit\t158\t2\t8\t2\t19\t6-10\t207\t208\tRight\t\t\tCharlotte Hornets\t2024\thttps://www.tiktok.com/@tidjanesalaun31\thttps://instagram.com/tidjane.sln
 65\thttps://www.basketball-reference.com/players/h/hollaro01.html\tRon Holland\thttps://www.basketball-reference.com/boxscores/202410230DET.html\tOct 23, '24, DET vs. IND\tSmall Forward\tDetroit Pistons\t19\t1\t81\t1266\t1\t5\t8,657,280\t35\tCap Hit\t146\t2\t9\t2\t17\t6-8\t206\t203\tRight\t\tDuncanville in Duncanville, Texas\tDetroit Pistons\t2024\thttps://www.tiktok.com/@_ronhoops\thttps://instagram.com/_ronhoops
 66\thttps://www.basketball-reference.com/players/c/castlst01.html\tStephon Castle\thttps://www.basketball-reference.com/boxscores/202410240DAL.html\tOct 24, '24, SAS @ DAL\tPoint Guard and Shooting Guard\tSan Antonio Spurs\t20\t1\t81\t2162\t1\t4\t9,560,520\t28\tCap Hit\t226\t3\t8\t3\t15\t6-6\t215\t198\tRight\tUConn\tNewton in Covington, Georgia\tSan Antonio Spurs\t2024\thttps://www.tiktok.com/@stephoncastle\thttps://instagram.com/stephcastle
@@ -448,10 +438,10 @@
 68\thttps://www.basketball-reference.com/players/s/sarral01.html\tAlex Sarr\thttps://www.basketball-reference.com/boxscores/202410240WAS.html\tOct 24, '24, WAS vs. BOS\tCenter and Power Forward\tWashington Wizards\t19\t1\t67\t1814\t1\t2\t11,808,240\t11\tCap Hit\t154\t2\t6\t2\t7\t7-0\t205\t213\tRight\t\tOvertime Elite Academy in Atlanta, Georgia\tWashington Wizards\t2024\thttps://www.tiktok.com/@alexandresarr20\thttps://instagram.com/alexsarr
 69\thttps://www.basketball-reference.com/players/r/risacza01.html\tZaccharie Risacher\thttps://www.basketball-reference.com/boxscores/202410230ATL.html\tOct 23, '24, ATL vs. BRK\tSmall Forward\tAtlanta Hawks\t19\t1\t75\t1843\t1\t1\t13,197,720\t0\tCap Hit\t140\t2\t6\t2\t2\t6-8\t200\t203\tRight\t\t\tAtlanta Hawks\t2024\t\thttps://instagram.com/_zacch_10`;
 
-
       // =======================
       // Helpers
       // =======================
+      function safeStr(x){ return (x == null) ? '' : String(x).trim(); }
       function toNum(x){
         if(x == null) return null;
         var s = String(x).trim();
@@ -460,7 +450,6 @@
         var n = Number(s);
         return Number.isFinite(n) ? n : null;
       }
-      function safeStr(x){ return (x == null) ? '' : String(x).trim(); }
       function fmtMoney(x){
         if(!Number.isFinite(x)) return '—';
         return '$' + Math.round(x).toLocaleString('en-US');
@@ -472,14 +461,6 @@
       function fmtInt(x){
         if(!Number.isFinite(x)) return '—';
         return Math.round(x).toLocaleString('en-US');
-      }
-      function quantile(sortedAsc, q){
-        if(!sortedAsc.length) return null;
-        var pos = (sortedAsc.length - 1) * q;
-        var base = Math.floor(pos);
-        var rest = pos - base;
-        if(sortedAsc[base+1] == null) return sortedAsc[base];
-        return sortedAsc[base] + rest * (sortedAsc[base+1] - sortedAsc[base]);
       }
 
       // NBA team id mapping for logos (nba.com CDN)
@@ -521,9 +502,24 @@
         return "https://cdn.nba.com/logos/nba/" + id + "/primary/L/logo.svg";
       }
 
-      // =======================
-      // Parse TSV -> player rows
-      // =======================
+      // Editorial locked order + key stat (CPM) ONLY
+      var EDITORIAL = {
+        overpaying: [
+          { team:"Atlanta Hawks",       keyStat:7161 },
+          { team:"Detroit Pistons",     keyStat:6838 },
+          { team:"San Antonio Spurs",   keyStat:4422 },
+          { team:"Charlotte Hornets",   keyStat:4175 },
+          { team:"Washington Wizards",  keyStat:3859 }
+        ],
+        value: [
+          { team:"Sacramento Kings",    keyStat:1042 },
+          { team:"Cleveland Cavaliers", keyStat:969  },
+          { team:"New Orleans Pelicans",keyStat:729  },
+          { team:"Denver Nuggets",      keyStat:682  },
+          { team:"Brooklyn Nets",       keyStat:565  }
+        ]
+      };
+
       function parseTSV(raw){
         var lines = raw.split(/\r?\n/).filter(function(l){ return l.trim().length > 0; });
         if(lines.length < 2) return [];
@@ -544,69 +540,75 @@
           var minutes = toNum(get(row,'Minutes Played'));
           var player = safeStr(get(row,'Player'));
           if(!player || !team) continue;
-
-          // exclude missing/zero salary (prevents fake "free minutes")
-          if(!(salary > 0) || !(minutes > 0)) continue;
-
+          if(!(salary > 0) || !(minutes > 0)) continue; // exclude missing/zero
           out.push({ team:team, player:player, salary:salary, minutes:minutes });
         }
         return out;
       }
 
-      var players = parseTSV(RAW_TSV);
-
-      // =======================
-      // Aggregate -> teams
-      // =======================
-      function buildTeams(rows){
+      function buildTeams(playerRows){
         var map = {};
-        rows.forEach(function(r){
+        playerRows.forEach(function(r){
           if(!map[r.team]){
-            map[r.team] = { team:r.team, rookieSalary:0, rookieMinutes:0, topRookies:[] };
+            map[r.team] = { team:r.team, rookieSalary:0, rookieMinutes:0, players:[] };
           }
-          var t = map[r.team];
-          t.rookieSalary += r.salary;
-          t.rookieMinutes += r.minutes;
-          t.topRookies.push({ player:r.player, minutes:r.minutes });
+          map[r.team].rookieSalary += r.salary;
+          map[r.team].rookieMinutes += r.minutes;
+          map[r.team].players.push({ player:r.player, minutes:r.minutes });
         });
 
-        var list = Object.keys(map).map(function(k){
+        return Object.keys(map).map(function(k){
           var t = map[k];
           t.costPerMinute = (t.rookieMinutes > 0) ? (t.rookieSalary / t.rookieMinutes) : null;
-          t.topRookies.sort(function(a,b){ return (b.minutes||0) - (a.minutes||0); });
-          t.topRookies = t.topRookies.slice(0,2); // simpler snippet
           t.logo = teamLogo(t.team);
+          t.players.sort(function(a,b){ return (b.minutes||0) - (a.minutes||0); });
+          t.topRookies = t.players.slice(0,2);
           return t;
         });
-
-        var costs = list.map(function(t){ return t.costPerMinute; })
-                        .filter(function(x){ return Number.isFinite(x); })
-                        .sort(function(a,b){ return a-b; });
-
-        var q33 = quantile(costs, 0.33);
-        var q66 = quantile(costs, 0.66);
-
-        list.forEach(function(t){
-          var c = t.costPerMinute;
-          if(!Number.isFinite(c) || q33 == null || q66 == null){
-            t.category = "neutral";
-          } else if(c <= q33){
-            t.category = "value";
-          } else if(c >= q66){
-            t.category = "overpaying";
-          } else {
-            t.category = "neutral";
-          }
-        });
-
-        return list;
       }
 
+      var players = parseTSV(RAW_TSV);
       var teamsAll = buildTeams(players);
 
-      // =======================
-      // UI + Rendering
-      // =======================
+      var teamByName = {};
+      teamsAll.forEach(function(t){ teamByName[t.team] = t; });
+
+      var lockSet = {};
+      EDITORIAL.overpaying.forEach(function(x){ lockSet[x.team] = true; });
+      EDITORIAL.value.forEach(function(x){ lockSet[x.team] = true; });
+
+      function makeEditorialList(which){
+        return EDITORIAL[which].map(function(item){
+          var t = teamByName[item.team] || { team:item.team, rookieSalary:null, rookieMinutes:null, logo:teamLogo(item.team), topRookies:[] };
+          return {
+            team: t.team,
+            rookieSalary: t.rookieSalary,
+            rookieMinutes: t.rookieMinutes,
+            costPerMinute: item.keyStat, // locked key stat from your writeup
+            logo: t.logo,
+            category: which,
+            topRookies: t.topRookies || []
+          };
+        });
+      }
+
+      var teamsOver = makeEditorialList('overpaying');
+      var teamsVal  = makeEditorialList('value');
+
+      var teamsNeutral = teamsAll
+        .filter(function(t){ return !lockSet[t.team]; })
+        .map(function(t){
+          return {
+            team:t.team,
+            rookieSalary:t.rookieSalary,
+            rookieMinutes:t.rookieMinutes,
+            costPerMinute:t.costPerMinute,
+            logo:t.logo,
+            category:'neutral',
+            topRookies:t.topRookies || []
+          };
+        });
+
       var rowsEl = root.querySelector('.rows-js');
       var emptyEl = root.querySelector('.empty-js');
       var metricHead = root.querySelector('.metric-head-js');
@@ -615,33 +617,12 @@
       var catBtns = root.querySelectorAll('.cat-btn-js');
       var sortSel = root.querySelector('.sort-js');
 
-      var countOverEl = root.querySelector('.count-overpaying-js');
-      var countNeutEl = root.querySelector('.count-neutral-js');
-      var countValEl = root.querySelector('.count-value-js');
+      var embedBtn = root.querySelector('.embed-btn-js');
+      var embedWrap = root.querySelector('.embed-wrap-js');
+      var embedCode = root.querySelector('.embed-code-js');
+      var embedStatus = root.querySelector('.embed-status-js');
 
-      var state = { cat:'overpaying', search:'', sort:'costPerMinute_desc' };
-
-      function setCounts(){
-        var o=0,n=0,v=0;
-        teamsAll.forEach(function(t){
-          if(t.category === 'overpaying') o++;
-          else if(t.category === 'value') v++;
-          else n++;
-        });
-        countOverEl.textContent = String(o);
-        countNeutEl.textContent = String(n);
-        countValEl.textContent = String(v);
-      }
-
-      function getSortFn(sortKey){
-        switch(sortKey){
-          case 'costPerMinute_asc': return function(a,b){ return (a.costPerMinute||0) - (b.costPerMinute||0); };
-          case 'rookieMinutes_desc': return function(a,b){ return (b.rookieMinutes||0) - (a.rookieMinutes||0); };
-          case 'rookieSalary_desc': return function(a,b){ return (b.rookieSalary||0) - (a.rookieSalary||0); };
-          case 'costPerMinute_desc':
-          default: return function(a,b){ return (b.costPerMinute||0) - (a.costPerMinute||0); };
-        }
-      }
+      var state = { cat:'overpaying', search:'', sort:'cpm_desc' };
 
       function tagClass(cat){
         if(cat === 'value') return 'good';
@@ -654,20 +635,28 @@
         return 'Neutral';
       }
 
+      function currentList(){
+        if(state.cat === 'overpaying') return teamsOver.slice();
+        if(state.cat === 'value') return teamsVal.slice();
+        return teamsNeutral.slice();
+      }
+
       function metricLabel(){
-        if(state.sort.indexOf('rookieMinutes') === 0) return 'Total rookie minutes';
-        if(state.sort.indexOf('rookieSalary') === 0) return 'Total rookie salary';
+        if(state.sort === 'mins_desc') return 'Total rookie minutes';
+        if(state.sort === 'sal_desc') return 'Total rookie salary';
         return 'Rookie cost / minute';
       }
-      function metricValue(t){
-        if(state.sort.indexOf('rookieMinutes') === 0) return t.rookieMinutes;
-        if(state.sort.indexOf('rookieSalary') === 0) return t.rookieSalary;
-        return t.costPerMinute;
-      }
-      function metricFormat(t){
-        if(state.sort.indexOf('rookieMinutes') === 0) return fmtInt(t.rookieMinutes) + ' min';
-        if(state.sort.indexOf('rookieSalary') === 0) return fmtMoney(t.rookieSalary);
-        return fmtCPM(t.costPerMinute);
+
+      function sortList(list){
+        if(state.cat !== 'neutral') return list; // locked order
+        switch(state.sort){
+          case 'cpm_asc':   return list.sort(function(a,b){ return (a.costPerMinute||0) - (b.costPerMinute||0); });
+          case 'mins_desc': return list.sort(function(a,b){ return (b.rookieMinutes||0) - (a.rookieMinutes||0); });
+          case 'sal_desc':  return list.sort(function(a,b){ return (b.rookieSalary||0) - (a.rookieSalary||0); });
+          case 'alpha_asc': return list.sort(function(a,b){ return String(a.team).localeCompare(String(b.team)); });
+          case 'cpm_desc':
+          default:          return list.sort(function(a,b){ return (b.costPerMinute||0) - (a.costPerMinute||0); });
+        }
       }
 
       function snippet(t){
@@ -679,28 +668,30 @@
 
       function render(){
         var q = (state.search || '').toLowerCase().trim();
-
-        var filtered = teamsAll.filter(function(t){
-          if(state.cat && t.category !== state.cat) return false;
-          if(q && t.team.toLowerCase().indexOf(q) === -1) return false;
-          return true;
-        });
-
-        filtered.sort(getSortFn(state.sort));
         metricHead.textContent = metricLabel();
 
-        var vals = filtered.map(function(t){ return metricValue(t); })
-                           .filter(function(x){ return Number.isFinite(x) && x > 0; });
+        var list = currentList();
+
+        if(q){
+          list = list.filter(function(t){
+            return (t.team || '').toLowerCase().indexOf(q) !== -1;
+          });
+        }
+
+        list = sortList(list);
+
+        var vals = list.map(function(t){ return t.costPerMinute; })
+                       .filter(function(x){ return Number.isFinite(x) && x > 0; });
         var max = 0;
         for(var i=0;i<vals.length;i++) if(vals[i] > max) max = vals[i];
         if(!Number.isFinite(max) || max <= 0) max = 1;
 
         var html = '';
-        for(var i2=0;i2<filtered.length;i2++){
-          var t2 = filtered[i2];
+        for(var i2=0;i2<list.length;i2++){
+          var t2 = list[i2];
           var rank = i2 + 1;
 
-          var mv = metricValue(t2);
+          var mv = t2.costPerMinute;
           var frac = (Number.isFinite(mv) && mv > 0) ? (mv / max) : 0;
           if(frac > 1) frac = 1;
 
@@ -720,26 +711,26 @@
             +     '<div style="min-width:0;">'
             +       '<p class="tname" title="' + t2.team + '">' + t2.team + '</p>'
             +       '<span class="tmeta">Rookie minutes: <strong>' + fmtInt(t2.rookieMinutes) + '</strong> • Rookie salary: <strong>' + fmtMoney(t2.rookieSalary) + '</strong></span>'
-            +       (snip ? '<div class="tmeta" style="margin-top:4px;">' + snip + '</div>' : '')
+            +       (snip ? '<div class="tmeta" style="margin-top:6px;">Top rookies: ' + snip + '</div>' : '')
             +     '</div>'
             +   '</div>'
             +   '<div class="metric" role="cell">'
-            +     '<div class="metric-big">' + metricFormat(t2) + '</div>'
+            +     '<div class="metric-big">' + fmtCPM(t2.costPerMinute) + '</div>'
             +     '<div class="pill-wrap">'
             +       '<div class="bar" aria-hidden="true"><span style="transform:scaleX(' + frac.toFixed(4) + ');"></span></div>'
-            +       '<span class="tag ' + tagClass(t2.category) + '"><span class="sw" aria-hidden="true"></span>' + tagLabel(t2.category) + '</span>'
+            +       '<span class="tag ' + tagClass(state.cat) + '"><span class="sw" aria-hidden="true"></span>' + tagLabel(state.cat) + '</span>'
             +     '</div>'
             +   '</div>'
             + '</div>';
         }
 
         rowsEl.innerHTML = html;
-        emptyEl.hidden = filtered.length !== 0;
+        emptyEl.hidden = list.length !== 0;
 
         summaryEl.innerHTML =
           '<strong>View:</strong> ' + tagLabel(state.cat) +
-          ' • <strong>Teams shown:</strong> ' + filtered.length +
-          ' • <strong>Sort:</strong> ' + metricLabel();
+          ' • <strong>Teams shown:</strong> ' + list.length +
+          (state.cat === 'neutral' ? (' • <strong>Sort:</strong> ' + metricLabel()) : ' • <strong>Sort:</strong> Editorial order');
       }
 
       function setCat(cat){
@@ -754,85 +745,48 @@
         b.addEventListener('click', function(){ setCat(b.getAttribute('data-cat')); });
       });
       searchInput.addEventListener('input', function(){ state.search = searchInput.value || ''; render(); });
-      sortSel.addEventListener('change', function(){ state.sort = sortSel.value; render(); });
 
-      <script>
-(function(){
-  var root = document.querySelector('.an-rookie-embed');
-  if(!root) return;
-
-  /* …all your existing JS… */
-
-  sortSel.addEventListener('change', function(){ state.sort = sortSel.value; render(); });
-
-  /* ✅ PASTE EMBED TOOLS JS HERE */
-  var embedBtn = root.querySelector('.embed-btn-js');
-  var embedWrap = root.querySelector('.embed-wrap-js');
-  var embedCode = root.querySelector('.embed-code-js');
-  var embedStatus = root.querySelector('.embed-status-js');
-
-  function setEmbedOpen(open){
-    if(!embedBtn || !embedWrap) return;
-    if(open){
-      embedWrap.removeAttribute('hidden');
-      embedBtn.setAttribute('aria-expanded','true');
-    }else{
-      embedWrap.setAttribute('hidden','');
-      embedBtn.setAttribute('aria-expanded','false');
-    }
-  }
-
-  function copyText(text){
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      return navigator.clipboard.writeText(text);
-    }
-    return new Promise(function(resolve, reject){
-      try{
-        embedCode.focus();
-        embedCode.select();
-        var ok = document.execCommand('copy');
-        ok ? resolve() : reject(new Error('copy failed'));
-      }catch(e){
-        reject(e);
-      }
-    });
-  }
-
-  if(embedBtn && embedWrap && embedCode){
-    embedBtn.setAttribute('aria-expanded', embedWrap.hasAttribute('hidden') ? 'false' : 'true');
-
-    embedBtn.addEventListener('click', function(){
-      var isOpen = !embedWrap.hasAttribute('hidden');
-
-      if(isOpen){
-        setEmbedOpen(false);
-        if(embedStatus) embedStatus.textContent = '';
-        return;
-      }
-
-      setEmbedOpen(true);
-
-      var text = embedCode.value;
-      copyText(text).then(function(){
-        if(embedStatus) embedStatus.textContent = 'Copied!';
-      }).catch(function(){
-        if(embedStatus) embedStatus.textContent = 'Opened. Copy manually if needed.';
+      sortSel.addEventListener('change', function(){
+        state.sort = sortSel.value;
+        render();
       });
-    });
-  }
 
-  /* keep these EXACTLY where they already are */
-  setCounts();
-  render();
-})();
-</script>
+      function copyText(text){
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          return navigator.clipboard.writeText(text);
+        }
+        return new Promise(function(resolve){
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly','');
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try{ document.execCommand('copy'); }catch(e){}
+          document.body.removeChild(ta);
+          resolve();
+        });
+      }
 
-      setCounts();
+      embedBtn.addEventListener('click', function(){
+        var isOpen = !embedWrap.hidden;
+        embedWrap.hidden = isOpen;
+        embedBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+
+        if(!embedWrap.hidden){
+          var text = embedCode.value || embedCode.textContent || '';
+          copyText(text).then(function(){
+            embedStatus.textContent = 'Copied!';
+            setTimeout(function(){ embedStatus.textContent = ''; }, 1800);
+          });
+        }
+      });
+
       render();
     })();
   </script>
 
 </section>
-
 </body>
 </html>
